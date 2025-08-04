@@ -1,0 +1,7 @@
+/vendor/
+/node_modules/
+wp-tests-lib
+/test-results/
+/.phpunit.result.cache
+
+.idea/*

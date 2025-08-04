@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Exit on error
+set -e
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}1. Installing Composer dependencies...${NC}"
+composer install
+
+echo -e "${GREEN}2. Installing NPM dependencies...${NC}"
+npm install
+
+echo -e "${GREEN}3. Setting up WordPress test environment...${NC}"
+yes y | bash scripts/install-wp-tests.sh \
+    wp_test_db \
+    wp_test_db_user \
+    'wp_test_f430ab33568392cf1d045706af16dfce' \
+    tanne.farn.de:3307 \
+    latest
+
+echo -e "${GREEN}4. Running PHPUnit tests...${NC}"
+./vendor/bin/phpunit
+
+echo -e "${GREEN}5. Running JavaScript tests...${NC}"
+npm test
