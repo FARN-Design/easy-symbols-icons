@@ -1,0 +1,17 @@
+.ei-icon-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 10px;
+}
+
+.ei-icon-item {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fff;
+	border-radius: 4px;
+	transition: border 0.2s ease-in-out;
+}

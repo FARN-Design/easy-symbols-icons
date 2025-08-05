@@ -59,7 +59,8 @@ class Settings
 		$defaultSettings = [
 			'load_more_button_text' => 'Load More',
 			'no_entries_found_text' => 'No Entries Found',
-			'google_api_key' => ''
+			'google_api_key' => '',
+			'loaded_fonts' => json_encode([]),
 		];
 
 		$results = self::$wpdb->get_results('SELECT Setting FROM ' .self::$tableName, ARRAY_N);

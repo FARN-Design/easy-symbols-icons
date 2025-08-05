@@ -3,10 +3,10 @@
 /*
 Plugin Name: Easyicon
 Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
-Description: A brief description of the Plugin.
+Description: A plugin to load and use various icon fonts with ease.
 Version: 1.0
 Author: marvin
-Author URI: http://URI_Of_The_Plugin_Author
+Author URI: https://farn.de/
 License: A "Slug" license name e.g. GPL2
 */
 
@@ -17,6 +17,8 @@ use Farn\Core\Update;
 use Farn\Core\License;
 use Farn\EasyIcon\database\Settings;
 use Farn\EasyIcon\menuPages\SettingsPage;
+use Farn\EasyIcon\blocks\Blocks;
+use Farn\EasyIcon\iconHandler\IconHandler;
 
 if (! defined( 'ABSPATH' ) ) {
     die;
@@ -54,6 +56,9 @@ class EasyIcon
             //License::initLicence(self::$software);
             Update::setup(self::$pluginSlug, self::$software, self::$pathToMainPluginFile, self::$pluginBaseName);
         }
+
+        Blocks::setup();
+        IconHandler::getInstance();
 
         //Activation and Deactivation
         register_activation_hook( __FILE__, [self::class, "pluginActivation"] );
