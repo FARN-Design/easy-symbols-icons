@@ -19,7 +19,8 @@
         }
     ],
     "require": {
-        // "farn/farn-core": "dev-main"
+        "farn/farn-core": "dev-main",
+        "phenx/php-font-lib": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
