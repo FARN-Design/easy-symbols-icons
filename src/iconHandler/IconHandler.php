@@ -36,6 +36,74 @@ class IconHandler {
         self::enqueueUnifiedFontCSS();
     }
 
+     /**
+     * Adds a custom font by accepting a font file blob.
+     * 
+     * @param string $fontBlob The content of the font file (binary data).
+     * @param string $fontName The desired name for the font file.
+     * 
+     * @return bool Returns true on success, false on failure.
+     */
+    public static function addFont(string $fontBlob, string $fontName): bool {
+        if (!self::isValidFontType($fontName)) {
+            error_log("Invalid Font Type");
+            return false;
+        }
+
+        $fontName = sanitize_file_name($fontName);
+
+        $fontDir = self::$iconsDir . '/' . (preg_replace('/\.(otf|ttf)$/i', '', $fontName));
+        if (!file_exists($fontDir)) {
+            mkdir($fontDir, 0755, true);
+        }
+
+        $fontPath = $fontDir . '/' . $fontName;
+
+        if (file_put_contents($fontPath, $fontBlob) !== false) {
+            error_log("Successfully created file at" . $fontPath);
+            return true;
+        }
+        
+        error_log("Failed to write to file");
+        return false;
+    }
+
+    /**
+     * Validates whether the font file type is either .ttf or .otf.
+     * 
+     * @param string $fontName The font file name.
+     * @return bool True if it's a valid font type, false otherwise.
+     */
+    private static function isValidFontType(string $fontName): bool {
+        $extension = strtolower(pathinfo($fontName, PATHINFO_EXTENSION));
+        return in_array($extension, ['ttf', 'otf']);
+    }
+
+    public static function removeFont(string $fontFolder): bool {
+        $font_dir = self::$iconsDir . '/' . $fontFolder;
+
+        if (!is_dir($font_dir)) {
+            return false;
+        }
+
+        $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+
+        foreach ($font_files as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+
+        rmdir($font_dir);
+
+        $loaded_fonts = json_decode(Settings::getSettingFromDB('loaded_fonts'), true) ?? [];
+        $loaded_fonts = array_diff($loaded_fonts, [$fontFolder]);
+
+        Settings::saveSettingInDB('loaded_fonts', json_encode($loaded_fonts));
+
+        return true;
+    }
+
     public static function getFontIcons(string $fontFolder): array {
         $icons = [];
 
@@ -69,7 +137,6 @@ class IconHandler {
         return $icons;
     }
 
-
     public static function getAvailableFonts(): array {
         $fonts = [];
 
@@ -96,6 +163,58 @@ class IconHandler {
         return $fonts;
     }
 
+    public static function getLoadedFonts(): array {
+        $loaded_fonts_json = Settings::getSettingFromDB('loaded_fonts');
+        
+        $loaded_fonts = json_decode($loaded_fonts_json, true) ?? [];
+    
+        return $loaded_fonts;
+    }
+
+    public static function getLoadedFontGlyphsMapping(): array {
+        $font_mappings = [];
+
+        $fonts = self::getLoadedFonts();
+
+        foreach ($fonts as $fontFolder) {
+            error_log($fontFolder);
+            $font_dir = self::$iconsDir . '/' . $fontFolder;
+            if (!is_dir($font_dir)) {
+                continue;
+            }
+
+            $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+            if (empty($font_files)) {
+                continue;
+            }
+
+            $font_file = $font_files[0];
+            try {
+                $font = Font::load($font_file);
+                $font->parse();
+
+                $char_map = $font->getUnicodeCharMap();
+                $font_glyphs = $font->getData('post', "names");
+
+                // Initialize an array for the current font
+                $glyphs_mapping = [];
+
+                foreach ($char_map as $unicode => $glyphIndex) {
+                    $glyph_name = isset($font_glyphs[$glyphIndex]) ? $font_glyphs[$glyphIndex] : 'uni' . strtoupper(dechex($unicode));
+
+                    // Append the glyph name and its unicode to the mapping
+                    $glyphs_mapping[] = [strtolower($glyph_name), '\\' . dechex($unicode)];
+                }
+
+                // Add the mapping to the font folder key in the result array
+                $font_mappings[$fontFolder] = $glyphs_mapping;
+            } catch (\Exception $e) {
+                error_log("Error loading font icons for '{$fontFolder}': " . $e->getMessage());
+            }
+        }
+
+        return $font_mappings;
+    }
 
     private static function createIconFolder(): void {
         if (!file_exists(self::$iconsDir)) {
@@ -175,7 +294,6 @@ class IconHandler {
                 continue;
             }
 
-            // Only support ttf and otf as of right now
             $font_files = glob($font_dir . '*.{ttf,otf}', GLOB_BRACE);
             if (empty($font_files)) {
                 continue;
@@ -193,13 +311,11 @@ class IconHandler {
                 $css_output .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($font_file) ."') format('truetype');}";
                 $css_output .= '[class^="ei-' . strtolower($fontFolder) . '-"]{font-family:"' . $font_name . '";}';
 
-
                 foreach ($char_map as $unicode => $glyphIndex) {
                     if (isset($font_glyphs[$glyphIndex])) {
                         $glyph = $font_glyphs[$glyphIndex];
                         $glyph_name = $glyph;
                     } else {
-                        // Fallback if no glyph found for this Unicode, use ligature approach
                         $glyph_name = 'uni' . strtoupper(dechex($unicode));
                     }
 
@@ -232,6 +348,12 @@ class IconHandler {
                     $css_file_url,
                     [],
                     filemtime($css_file_dir)
+                );
+            });
+
+            add_action('admin_init', function() use ($css_file_url) {
+                add_editor_style(
+                    $css_file_url
                 );
             });
         } else {

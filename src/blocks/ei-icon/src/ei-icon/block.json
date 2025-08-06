@@ -9,7 +9,12 @@
 	"description": "Insert an icon from enabled icon fonts.",
 	"example": {},
 	"supports": {
-		"html": false
+		"html": false,
+		"align": true,
+		"color": {
+			"text": true,
+			"background": true
+		}
 	},
 	"keywords": ["icon", "loader", "font", "ei-icon"],
 	"textdomain": "ei-icon",

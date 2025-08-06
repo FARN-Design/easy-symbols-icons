@@ -14,7 +14,12 @@ return array(
 			
 		),
 		'supports' => array(
-			'html' => false
+			'html' => false,
+			'align' => true,
+			'color' => array(
+				'text' => true,
+				'background' => true
+			)
 		),
 		'keywords' => array(
 			'icon',

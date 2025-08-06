@@ -1,10 +1,19 @@
-import { useBlockProps } from '@wordpress/block-editor';
+const { __ } = wp.i18n;
+const { useSelect } = wp.data;
 
-export default function save() {
-	const blockProps = useBlockProps.save();
-	return (
-		<div { ...blockProps }>
-			<span class="icon-dashicons-products">t</span>
-		</div>
-	);
+export default function Save({ attributes }) {
+    const { className } = attributes;
+
+	console.log(className);
+
+    return (
+        <div className="selected-icon-wrapper">
+            {className ? (
+                <span className={className} style={{ fontSize: '30px' }}></span>
+            ) : (
+                <p>{__('No Icon Selected', 'easyicon')}</p>
+            )}
+        </div>
+    );
 }
+

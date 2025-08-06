@@ -8,7 +8,7 @@
   \********************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"easyicon/ei-icon","version":"0.1.0","title":"Ei Icon","category":"widgets","icon":"format","description":"Insert an icon from enabled icon fonts.","example":{},"supports":{"html":false},"keywords":["icon","loader","font","ei-icon"],"textdomain":"ei-icon","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"easyicon/ei-icon","version":"0.1.0","title":"Ei Icon","category":"widgets","icon":"format","description":"Insert an icon from enabled icon fonts.","example":{},"supports":{"html":false,"align":true,"color":{"text":true,"background":true}},"keywords":["icon","loader","font","ei-icon"],"textdomain":"ei-icon","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
 
 /***/ }),
 
@@ -33,70 +33,118 @@ const {
   useEffect
 } = wp.element;
 const {
-  PanelBody,
-  SelectControl
+  TextControl
 } = wp.components;
-const {
-  InspectorControls
-} = wp.blockEditor;
-
-// Access the localized fonts data injected by wp_add_inline_script
-const ICON_FONTS = eiIconData.fonts; // Access fonts from the inline script
-
 function Edit({
   attributes,
   setAttributes
 }) {
-  const {
-    iconFont,
-    iconName
-  } = attributes;
-  const [availableIcons, setAvailableIcons] = useState([]);
-
-  // Update available icons when the font changes
+  const [fonts, setFonts] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIcon, setSelectedIcon] = useState(null);
   useEffect(() => {
-    if (iconFont && ICON_FONTS[iconFont]) {
-      setAvailableIcons(ICON_FONTS[iconFont]);
-    }
-  }, [iconFont]);
-  const onFontChange = newFont => {
-    setAttributes({
-      iconFont: newFont,
-      iconName: ''
-    });
-  };
-  const onIconSelect = name => {
-    setAttributes({
-      iconName: name
-    });
-  };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(InspectorControls, {
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(PanelBody, {
-        title: __('Icon Settings', 'ei-icon'),
-        initialOpen: true,
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(SelectControl, {
-          label: __('Icon Font', 'ei-icon'),
-          value: iconFont,
-          options: Object.keys(ICON_FONTS).map(font => ({
-            label: font,
-            value: font
-          })),
-          onChange: onFontChange
-        })
-      })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-      className: "ei-icon-grid",
-      children: availableIcons.map(icon => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-        className: `ei-icon-item ${iconFont === 'dashicons' ? `dashicons dashicons-${icon}` : icon}`,
-        onClick: () => onIconSelect(icon),
-        style: {
-          fontSize: '32px',
-          padding: '10px',
-          cursor: 'pointer',
-          border: icon === iconName ? '2px solid #007cba' : '1px solid #ccc'
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/?rest_route=/easyicon/v1/fonts');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
-      }, icon))
+        const json = await response.json();
+        if (typeof json === 'object') {
+          setFonts(json);
+        } else {
+          setError('Data is not in the expected format.');
+        }
+        setLoading(false);
+      } catch (error) {
+        setError('Failed to fetch fonts');
+        setLoading(false);
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Filter fonts based on the search term
+  const filteredFonts = Object.keys(fonts).map(fontFolder => {
+    const fontArray = fonts[fontFolder];
+    const filteredGlyphs = fontArray.filter(([name]) => {
+      return name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+    return {
+      fontFolder,
+      glyphs: filteredGlyphs
+    };
+  }).filter(font => font.glyphs.length > 0);
+
+  // Handle icon selection and update attributes
+  const handleIconClick = className => {
+    setSelectedIcon({
+      className
+    });
+    setAttributes({
+      className
+    });
+  };
+
+  // Render the icons grid and selected icon preview
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+      className: "ei-icon-search",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(TextControl, {
+        label: __('Search Icons', 'easyicon'),
+        value: searchTerm,
+        onChange: value => setSearchTerm(value),
+        placeholder: __('Search by glyph name...', 'easyicon'),
+        __next40pxDefaultSize: true,
+        __nextHasNoMarginBottom: true
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+      className: "ei-icon-grid",
+      children: [loading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
+        children: __('Loading fonts...', 'easyicon')
+      }), error && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("p", {
+        children: [__('Error: ', 'easyicon'), error]
+      }), !loading && !error && filteredFonts.length > 0 && filteredFonts.map((font, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("details", {
+        className: "ei-font-details",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("summary", {
+          children: font.fontFolder
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+          className: "ei-font-icons",
+          children: font.glyphs.map(([name], i) => {
+            // Dynamic class name for rendering the icon
+            const className = `ei-${font.fontFolder.toLowerCase()}-${name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
+            return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", {
+              className: "ei-font-icon",
+              onClick: () => handleIconClick(className),
+              style: {
+                cursor: 'pointer',
+                fontSize: '20px',
+                margin: '5px'
+              },
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+                className: className
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+                children: name
+              })]
+            }, i);
+          })
+        })]
+      }, index)), !loading && !error && filteredFonts.length === 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
+        children: __('No fonts found', 'easyicon')
+      })]
+    }), selectedIcon && selectedIcon.className && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+      className: "selected-icon-preview",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
+        children: __('Selected Icon:', 'easyicon')
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+        className: selectedIcon.className,
+        style: {
+          fontSize: '30px'
+        }
+      })]
     })]
   });
 }
@@ -136,21 +184,33 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ save)
+/* harmony export */   "default": () => (/* binding */ Save)
 /* harmony export */ });
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__);
 
-
-function save() {
-  const blockProps = _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps.save();
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
-    ...blockProps,
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
-      class: "icon-dashicons-products",
-      children: "t"
+const {
+  __
+} = wp.i18n;
+const {
+  useSelect
+} = wp.data;
+function Save({
+  attributes
+}) {
+  const {
+    className
+  } = attributes;
+  console.log(className);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+    className: "selected-icon-wrapper",
+    children: className ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+      className: className,
+      style: {
+        fontSize: '30px'
+      }
+    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
+      children: __('No Icon Selected', 'easyicon')
     })
   });
 }
@@ -166,16 +226,6 @@ function save() {
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
-
-/***/ }),
-
-/***/ "@wordpress/block-editor":
-/*!*************************************!*\
-  !*** external ["wp","blockEditor"] ***!
-  \*************************************/
-/***/ ((module) => {
-
-module.exports = window["wp"]["blockEditor"];
 
 /***/ }),
 
