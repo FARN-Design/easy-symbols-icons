@@ -8,6 +8,7 @@ use FontLib\Font;
 
 class IconHandler {
     private static IconHandler $instance;
+
     public static string $iconsDir;
     public static string $iconsUrl;
     private static string $pluginAssetsDir;
@@ -83,8 +84,8 @@ class IconHandler {
     }
 
     private static function isValidFontType(string $fontName): bool {
-        $extension = strtolower(pathinfo($fontName, PATHINFO_EXTENSION));
-        return in_array($extension, ['ttf', 'otf']);
+        $allowedExtensions = ['ttf', 'otf'];
+        return in_array(pathinfo($fontName, PATHINFO_EXTENSION), $allowedExtensions, true);
     }
 
     public static function removeFont(string $fontFolder): bool {
@@ -113,36 +114,14 @@ class IconHandler {
     }
 
     public static function getFontIcons(string $fontFolder): array {
-        $icons = [];
+        $fontDir = self::$iconsDir . '/' . $fontFolder;
+        $fontFiles = glob($fontDir . '/*.{ttf,otf}', GLOB_BRACE);
 
-        $font_dir = self::$iconsDir . '/' . $fontFolder;
-        if (!is_dir($font_dir)) {
-            return $icons;
+        if (empty($fontFiles)) {
+            return [];
         }
 
-        $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
-        if (empty($font_files)) {
-            return $icons;
-        }
-
-        $font_file = $font_files[0];
-
-        try {
-            $font = Font::load($font_file);
-            $font->parse();
-
-            $char_map = $font->getUnicodeCharMap();
-            $font_glyphs = $font->getData('post', "names");
-
-            foreach ($char_map as $unicode => $glyphIndex) {
-                $glyph_name = isset($font_glyphs[$glyphIndex]) ? $font_glyphs[$glyphIndex] : 'uni' . strtoupper(dechex($unicode));
-                $icons[] = strtolower($glyph_name);  // Collect glyph names for the font
-            }
-        } catch (\Exception $e) {
-            error_log("Error loading font icons: " . $e->getMessage());
-        }
-
-        return $icons;
+        return self::parseFontFile($fontFiles[0]);
     }
 
     public static function getAvailableFonts(): array {
@@ -227,7 +206,7 @@ class IconHandler {
     }
 
     private static function copyFontsFromAssets(): void {
-        self::$pluginAssetsDir;
+        $plugin_assets_dir = self::$pluginAssetsDir;
 
         if (!is_dir($plugin_assets_dir)) {
             error_log('Error: Plugin assets directory does not exist.');
@@ -237,27 +216,19 @@ class IconHandler {
         $files = self::getAllFilesAndDirs($plugin_assets_dir);
 
         foreach ($files as $file) {
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
+            $fontName = basename($file);
+            $fontBlob = file_get_contents($file);
 
-            if (!in_array(strtolower($extension), ['ttf', 'otf'])) {
-                error_log('Skipping non-font file: ' . $file);
+            if ($fontBlob === false) {
+                error_log("Failed to read font file: {$fontName}");
+                continue;
+            }
+            if (empty($fontName) || empty($fontBlob)) {
+                error_log("Invalid font data for file: {$fontName}");
                 continue;
             }
 
-            $font_name = basename($file);
-            $fontDir = self::$iconsDir . '/' . (preg_replace('/\.(otf|ttf)$/i', '', $font_name));
-            $fontPath = $fontDir . '/' . $font_name;
-
-            if (file_exists($fontPath)) {
-                continue;
-            }
-
-            if (!is_dir($fontDir)) {
-                mkdir($fontDir, 0755, true);
-            }
-
-            $font_blob = file_get_contents($file);
-            if (file_put_contents($fontPath, $font_blob) !== false) {
+            if (self::addFont($fontBlob, $fontName)) {
                 error_log("Successfully copied font from assets: {$font_name}");
             } else {
                 error_log("Failed to copy font from assets: {$font_name}");
@@ -284,6 +255,29 @@ class IconHandler {
 
         return $results;
     }
+
+    private static function parseFontFile(string $fontFile): array {
+        try {
+            $font = Font::load($fontFile);
+            $font->parse();
+
+            $charMap = $font->getUnicodeCharMap();
+            $fontGlyphs = $font->getData('post', 'names');
+            
+            $glyphs = [];
+            foreach ($charMap as $unicode => $glyphIndex) {
+                $glyphName = $fontGlyphs[$glyphIndex] ?? 'uni' . strtoupper(dechex($unicode));
+                $glyphs[strtolower($glyphName)] = '\\' . dechex($unicode);
+            }
+
+            return $glyphs;
+        } catch (\Exception $e) {
+            error_log("Error loading font file '{$fontFile}': " . $e->getMessage());
+        }
+
+        return [];
+    }
+
 
     private static function generateUnifiedFontCSS(): void {
         $enabled_fonts_json = Settings::getSettingFromDB('loaded_fonts');
