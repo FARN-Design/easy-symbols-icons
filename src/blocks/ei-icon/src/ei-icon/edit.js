@@ -1,13 +1,19 @@
 const { __ } = wp.i18n;
 const { useState, useEffect } = wp.element;
-const { TextControl } = wp.components;
+const { TextControl, PanelBody, PanelRow, ColorPicker } = wp.components;
+const { BlockControls, AlignmentToolbar, InspectorControls } = wp.blockEditor;
 
 export default function Edit({ attributes, setAttributes }) {
+    const { fontSize, lineHeight, align, backgroundColor, textColor, className } = attributes;
+
     const [fonts, setFonts] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedIcon, setSelectedIcon] = useState(null);
+    const [showFontSelection, setShowFontSelection] = useState(false);
+
+    const [selectedIcon, setSelectedIcon] = useState({ className });
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,7 +43,6 @@ export default function Edit({ attributes, setAttributes }) {
         fetchData();
     }, []);
 
-    // Filter fonts based on the search term
     const filteredFonts = Object.keys(fonts).map(fontFolder => {
         const fontArray = fonts[fontFolder];
 
@@ -51,68 +56,141 @@ export default function Edit({ attributes, setAttributes }) {
         };
     }).filter(font => font.glyphs.length > 0);
 
-    // Handle icon selection and update attributes
+    const handleTypographyChange = (value, property) => {
+        setAttributes({ [property]: value });
+    };
+
+    const handleAlignmentChange = (newAlign) => {
+        setAttributes({ align: newAlign });
+    };
+
     const handleIconClick = (className) => {
         setSelectedIcon({ className });
         setAttributes({ className });
+        setShowFontSelection(false);
     };
 
-    // Render the icons grid and selected icon preview
+    const toggleFontSelection = () => {
+        setShowFontSelection(prevState => !prevState);
+    };
+
     return (
-        <>
-            <div className="ei-icon-search">
-                <TextControl
-                    label={__('Search Icons', 'easyicon')}
-                    value={searchTerm}
-                    onChange={(value) => setSearchTerm(value)}
-                    placeholder={__('Search by glyph name...', 'easyicon')}
-                    __next40pxDefaultSize={true}
-                    __nextHasNoMarginBottom={true}
+         <>
+            <BlockControls>
+                <AlignmentToolbar
+                    value={align}
+                    onChange={handleAlignmentChange}
                 />
+            </BlockControls>
+
+            <InspectorControls>
+                <PanelBody title={__('Icon Settings', 'easyicon')}>
+                    <PanelRow>
+                        <TextControl
+                            label={__('Font Size', 'easyicon')}
+                            value={fontSize}
+                            onChange={(value) => handleTypographyChange(value, 'fontSize')}
+                            type="number"
+                            min="10"
+                            max="200"
+                            step="1"
+                        />
+                    </PanelRow>
+
+                    <PanelRow>
+                        <TextControl
+                            label={__('Line Height', 'easyicon')}
+                            value={lineHeight}
+                            onChange={(value) => handleTypographyChange(value, 'lineHeight')}
+                            type="number"
+                            min="10"
+                            max="200"
+                            step="1"
+                        />
+                    </PanelRow>
+
+                    <PanelRow>
+                        <label>{__('Background Color', 'easyicon')}</label>
+                        <ColorPicker
+                            color={backgroundColor}
+                            onChangeComplete={(color) => setAttributes({ backgroundColor: color.hex })}
+                        />
+                    </PanelRow>
+
+                    <PanelRow>
+                        <label>{__('Text Color', 'easyicon')}</label>
+                        <ColorPicker
+                            color={textColor}
+                            onChangeComplete={(color) => setAttributes({ textColor: color.hex })}
+                        />
+                    </PanelRow>
+                </PanelBody>
+            </InspectorControls>
+
+            <div
+                className={`selected-icon-wrapper align${align}`}
+                style={{
+                    fontSize: fontSize ? `${fontSize}px` : undefined,
+                    lineHeight: lineHeight ? `${lineHeight}px` : undefined,
+                    backgroundColor: backgroundColor || undefined,
+                    color: textColor || undefined,
+                }}
+            >
+                {selectedIcon.className ? (
+                    <span
+                        className={selectedIcon.className}
+                        style={{ cursor: 'pointer' }}
+                        onClick={toggleFontSelection}
+                    />
+                ) : (
+                    <p onClick={toggleFontSelection}>
+                        {__('No Icon Selected', 'easyicon')}
+                    </p>
+                )}
             </div>
 
-            <div className="ei-icon-grid">
-                {loading && <p>{__('Loading fonts...', 'easyicon')}</p>}
-                {error && <p>{__('Error: ', 'easyicon')}{error}</p>}
-                
-                {!loading && !error && filteredFonts.length > 0 && (
-                    filteredFonts.map((font, index) => (
-                        <details key={index} className="ei-font-details">
-                            <summary>{font.fontFolder}</summary>
-                            <div className="ei-font-icons">
-                                {font.glyphs.map(([name], i) => {
-                                    // Dynamic class name for rendering the icon
-                                    const className = `ei-${font.fontFolder.toLowerCase()}-${name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
+            {showFontSelection && (
+                <div className="ei-icon-grid">
+                    <div className="ei-icon-search">
+                        <TextControl
+                            label={__('Search Icons', 'easyicon')}
+                            value={searchTerm}
+                            onChange={(value) => setSearchTerm(value)}
+                            placeholder={__('Search by glyph name...', 'easyicon')}
+                        />
+                    </div>
 
-                                    return (
-                                        <span 
-                                            key={i}
-                                            className="ei-font-icon"
-                                            onClick={() => handleIconClick(className)}
-                                            style={{ cursor: 'pointer', fontSize: '20px', margin: '5px' }}
-                                        >
-                                            <span className={className}></span>
-                                            <span>{name}</span>
-                                        </span>
-                                    );
-                                })}
-                            </div>
-                        </details>
-                    ))
-                )}
+                    {loading && <p>{__('Loading fonts...', 'easyicon')}</p>}
+                    {error && <p>{__('Error: ', 'easyicon')}{error}</p>}
 
-                {!loading && !error && filteredFonts.length === 0 && (
-                    <p>{__('No fonts found', 'easyicon')}</p>
-                )}
-            </div>
+                    {!loading && !error && filteredFonts.length > 0 && (
+                        filteredFonts.map((font, index) => (
+                            <details key={index} className="ei-font-details">
+                                <summary>{font.fontFolder}</summary>
+                                <div className="ei-font-icons">
+                                    {font.glyphs.map(([name], i) => {
+                                        const iconClass = `ei-${font.fontFolder.toLowerCase()}-${name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
 
-            {selectedIcon && selectedIcon.className && (
-                <div className="selected-icon-preview">
-                    <p>{__('Selected Icon:', 'easyicon')}</p>
-                    <span 
-                        className={selectedIcon.className} 
-                        style={{ fontSize: '30px' }}
-                    ></span>
+                                        return (
+                                            <span
+                                                key={i}
+                                                className="ei-font-icon"
+                                                onClick={() => handleIconClick(iconClass)} // Select icon on click
+                                                style={{ cursor: 'pointer', fontSize: '20px', margin: '5px' }}
+                                            >
+                                                <span className={iconClass}></span>
+                                                <span>{name}</span>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            </details>
+                        ))
+                    )}
+
+                    {!loading && !error && filteredFonts.length === 0 && (
+                        <p>{__('No fonts found', 'easyicon')}</p>
+                    )}
                 </div>
             )}
         </>

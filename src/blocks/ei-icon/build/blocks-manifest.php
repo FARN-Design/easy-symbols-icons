@@ -19,6 +19,10 @@ return array(
 			'color' => array(
 				'text' => true,
 				'background' => true
+			),
+			'typography' => array(
+				'fontSize' => true,
+				'lineHeight' => true
 			)
 		),
 		'keywords' => array(

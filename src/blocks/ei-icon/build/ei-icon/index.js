@@ -8,7 +8,7 @@
   \********************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"easyicon/ei-icon","version":"0.1.0","title":"Ei Icon","category":"widgets","icon":"format","description":"Insert an icon from enabled icon fonts.","example":{},"supports":{"html":false,"align":true,"color":{"text":true,"background":true}},"keywords":["icon","loader","font","ei-icon"],"textdomain":"ei-icon","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"easyicon/ei-icon","version":"0.1.0","title":"Ei Icon","category":"widgets","icon":"format","description":"Insert an icon from enabled icon fonts.","example":{},"supports":{"html":false,"align":true,"color":{"text":true,"background":true},"typography":{"fontSize":true,"lineHeight":true}},"keywords":["icon","loader","font","ei-icon"],"textdomain":"ei-icon","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
 
 /***/ }),
 
@@ -33,17 +33,36 @@ const {
   useEffect
 } = wp.element;
 const {
-  TextControl
+  TextControl,
+  PanelBody,
+  PanelRow,
+  ColorPicker
 } = wp.components;
+const {
+  BlockControls,
+  AlignmentToolbar,
+  InspectorControls
+} = wp.blockEditor;
 function Edit({
   attributes,
   setAttributes
 }) {
+  const {
+    fontSize,
+    lineHeight,
+    align,
+    backgroundColor,
+    textColor,
+    className
+  } = attributes;
   const [fonts, setFonts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState(null);
+  const [showFontSelection, setShowFontSelection] = useState(false);
+  const [selectedIcon, setSelectedIcon] = useState({
+    className
+  });
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -66,8 +85,6 @@ function Edit({
     };
     fetchData();
   }, []);
-
-  // Filter fonts based on the search term
   const filteredFonts = Object.keys(fonts).map(fontFolder => {
     const fontArray = fonts[fontFolder];
     const filteredGlyphs = fontArray.filter(([name]) => {
@@ -78,8 +95,16 @@ function Edit({
       glyphs: filteredGlyphs
     };
   }).filter(font => font.glyphs.length > 0);
-
-  // Handle icon selection and update attributes
+  const handleTypographyChange = (value, property) => {
+    setAttributes({
+      [property]: value
+    });
+  };
+  const handleAlignmentChange = newAlign => {
+    setAttributes({
+      align: newAlign
+    });
+  };
   const handleIconClick = className => {
     setSelectedIcon({
       className
@@ -87,23 +112,89 @@ function Edit({
     setAttributes({
       className
     });
+    setShowFontSelection(false);
   };
-
-  // Render the icons grid and selected icon preview
+  const toggleFontSelection = () => {
+    setShowFontSelection(prevState => !prevState);
+  };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-      className: "ei-icon-search",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(TextControl, {
-        label: __('Search Icons', 'easyicon'),
-        value: searchTerm,
-        onChange: value => setSearchTerm(value),
-        placeholder: __('Search by glyph name...', 'easyicon'),
-        __next40pxDefaultSize: true,
-        __nextHasNoMarginBottom: true
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(BlockControls, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(AlignmentToolbar, {
+        value: align,
+        onChange: handleAlignmentChange
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(InspectorControls, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(PanelBody, {
+        title: __('Icon Settings', 'easyicon'),
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(PanelRow, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(TextControl, {
+            label: __('Font Size', 'easyicon'),
+            value: fontSize,
+            onChange: value => handleTypographyChange(value, 'fontSize'),
+            type: "number",
+            min: "10",
+            max: "200",
+            step: "1"
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(PanelRow, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(TextControl, {
+            label: __('Line Height', 'easyicon'),
+            value: lineHeight,
+            onChange: value => handleTypographyChange(value, 'lineHeight'),
+            type: "number",
+            min: "10",
+            max: "200",
+            step: "1"
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(PanelRow, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+            children: __('Background Color', 'easyicon')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(ColorPicker, {
+            color: backgroundColor,
+            onChangeComplete: color => setAttributes({
+              backgroundColor: color.hex
+            })
+          })]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(PanelRow, {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+            children: __('Text Color', 'easyicon')
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(ColorPicker, {
+            color: textColor,
+            onChangeComplete: color => setAttributes({
+              textColor: color.hex
+            })
+          })]
+        })]
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+      className: `selected-icon-wrapper align${align}`,
+      style: {
+        fontSize: fontSize ? `${fontSize}px` : undefined,
+        lineHeight: lineHeight ? `${lineHeight}px` : undefined,
+        backgroundColor: backgroundColor || undefined,
+        color: textColor || undefined
+      },
+      children: selectedIcon.className ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+        className: selectedIcon.className,
+        style: {
+          cursor: 'pointer'
+        },
+        onClick: toggleFontSelection
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
+        onClick: toggleFontSelection,
+        children: __('No Icon Selected', 'easyicon')
+      })
+    }), showFontSelection && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
       className: "ei-icon-grid",
-      children: [loading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+        className: "ei-icon-search",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(TextControl, {
+          label: __('Search Icons', 'easyicon'),
+          value: searchTerm,
+          onChange: value => setSearchTerm(value),
+          placeholder: __('Search by glyph name...', 'easyicon')
+        })
+      }), loading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
         children: __('Loading fonts...', 'easyicon')
       }), error && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("p", {
         children: [__('Error: ', 'easyicon'), error]
@@ -114,18 +205,18 @@ function Edit({
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
           className: "ei-font-icons",
           children: font.glyphs.map(([name], i) => {
-            // Dynamic class name for rendering the icon
-            const className = `ei-${font.fontFolder.toLowerCase()}-${name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
+            const iconClass = `ei-${font.fontFolder.toLowerCase()}-${name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
             return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", {
               className: "ei-font-icon",
-              onClick: () => handleIconClick(className),
+              onClick: () => handleIconClick(iconClass) // Select icon on click
+              ,
               style: {
                 cursor: 'pointer',
                 fontSize: '20px',
                 margin: '5px'
               },
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
-                className: className
+                className: iconClass
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
                 children: name
               })]
@@ -134,16 +225,6 @@ function Edit({
         })]
       }, index)), !loading && !error && filteredFonts.length === 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
         children: __('No fonts found', 'easyicon')
-      })]
-    }), selectedIcon && selectedIcon.className && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-      className: "selected-icon-preview",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
-        children: __('Selected Icon:', 'easyicon')
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
-        className: selectedIcon.className,
-        style: {
-          fontSize: '30px'
-        }
       })]
     })]
   });
@@ -193,22 +274,30 @@ const {
   __
 } = wp.i18n;
 const {
-  useSelect
-} = wp.data;
+  useBlockProps
+} = wp.blockEditor;
 function Save({
   attributes
 }) {
   const {
-    className
+    className,
+    fontSize,
+    lineHeight,
+    backgroundColor,
+    textColor,
+    align
   } = attributes;
-  console.log(className);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-    className: "selected-icon-wrapper",
+    ...useBlockProps.save(),
+    className: `selected-icon-wrapper align${align}`,
+    style: {
+      fontSize: fontSize ? `${fontSize}px` : undefined,
+      lineHeight: lineHeight ? `${lineHeight}px` : undefined,
+      backgroundColor: backgroundColor || undefined,
+      color: textColor || undefined
+    },
     children: className ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
-      className: className,
-      style: {
-        fontSize: '30px'
-      }
+      className: className
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
       children: __('No Icon Selected', 'easyicon')
     })

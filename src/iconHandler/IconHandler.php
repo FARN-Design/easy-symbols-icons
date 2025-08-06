@@ -68,12 +68,6 @@ class IconHandler {
         return false;
     }
 
-    /**
-     * Validates whether the font file type is either .ttf or .otf.
-     * 
-     * @param string $fontName The font file name.
-     * @return bool True if it's a valid font type, false otherwise.
-     */
     private static function isValidFontType(string $fontName): bool {
         $extension = strtolower(pathinfo($fontName, PATHINFO_EXTENSION));
         return in_array($extension, ['ttf', 'otf']);
@@ -177,7 +171,6 @@ class IconHandler {
         $fonts = self::getLoadedFonts();
 
         foreach ($fonts as $fontFolder) {
-            error_log($fontFolder);
             $font_dir = self::$iconsDir . '/' . $fontFolder;
             if (!is_dir($font_dir)) {
                 continue;
@@ -196,17 +189,14 @@ class IconHandler {
                 $char_map = $font->getUnicodeCharMap();
                 $font_glyphs = $font->getData('post', "names");
 
-                // Initialize an array for the current font
                 $glyphs_mapping = [];
 
                 foreach ($char_map as $unicode => $glyphIndex) {
                     $glyph_name = isset($font_glyphs[$glyphIndex]) ? $font_glyphs[$glyphIndex] : 'uni' . strtoupper(dechex($unicode));
 
-                    // Append the glyph name and its unicode to the mapping
                     $glyphs_mapping[] = [strtolower($glyph_name), '\\' . dechex($unicode)];
                 }
 
-                // Add the mapping to the font folder key in the result array
                 $font_mappings[$fontFolder] = $glyphs_mapping;
             } catch (\Exception $e) {
                 error_log("Error loading font icons for '{$fontFolder}': " . $e->getMessage());
@@ -232,27 +222,31 @@ class IconHandler {
 
         $files = self::getAllFilesAndDirs($plugin_assets_dir);
 
-        foreach ( $files as $file ) {
-            $relative_path = substr( $file, strlen( $plugin_assets_dir ) );
-            $destination = self::$iconsDir . '/' . $relative_path;
+        foreach ($files as $file) {
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-            if ( is_dir( $file ) ) {
-                if ( ! is_dir( $destination ) ) {
-                    mkdir( $destination, 0755, true );
-                }
+            if (!in_array(strtolower($extension), ['ttf', 'otf'])) {
+                error_log('Skipping non-font file: ' . $file);
+                continue;
+            }
+
+            $font_name = basename($file);
+            $fontDir = self::$iconsDir . '/' . (preg_replace('/\.(otf|ttf)$/i', '', $font_name));
+            $fontPath = $fontDir . '/' . $font_name;
+
+            if (file_exists($fontPath)) {
+                continue;
+            }
+
+            if (!is_dir($fontDir)) {
+                mkdir($fontDir, 0755, true);
+            }
+
+            $font_blob = file_get_contents($file);
+            if (file_put_contents($fontPath, $font_blob) !== false) {
+                error_log("Successfully copied font from assets: {$font_name}");
             } else {
-                $destination_dir = dirname( $destination );
-                if ( ! is_dir( $destination_dir ) ) {
-                    mkdir( $destination_dir, 0755, true );
-                }
-
-                if ( ! file_exists( $destination ) ) {
-                    if ( copy( $file, $destination ) ) {
-                        break;
-                    } else {
-                        error_log('Error copying file: ' . $file);
-                    }
-                }
+                error_log("Failed to copy font from assets: {$font_name}");
             }
         }
     }
@@ -283,6 +277,14 @@ class IconHandler {
 
         if (empty($enabled_fonts)) {
             error_log("No fonts enabled.");
+            return;
+        }
+
+        $previous_loaded_fonts_json = get_option('ei_prev_loaded_fonts', '[]');
+        $previous_loaded_fonts = json_decode($previous_loaded_fonts_json, true);
+
+        if ($enabled_fonts === $previous_loaded_fonts) {
+            error_log("No new loaded fonts, skipping css regeneration...");
             return;
         }
 
@@ -334,6 +336,8 @@ class IconHandler {
             $css_file = self::$iconsDir . '/generated-icons.css';
             file_put_contents($css_file, $css_output);
         }
+
+        update_option('ei_prev_loaded_fonts', json_encode($enabled_fonts));
     }
 
     private static function enqueueUnifiedFontCSS(): void {

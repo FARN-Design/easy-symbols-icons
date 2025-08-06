@@ -4,5 +4,6 @@ wp-tests-lib
 /test-results/
 /.phpunit.result.cache
 .vscode
+*/build/**
 
 .idea/*
