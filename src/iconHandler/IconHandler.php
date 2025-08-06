@@ -8,13 +8,15 @@ use FontLib\Font;
 
 class IconHandler {
     private static IconHandler $instance;
-    private static string $iconsDir;
-    private static string $iconsUrl;
+    public static string $iconsDir;
+    public static string $iconsUrl;
+    private static string $pluginAssetsDir;
 
     private function __construct() {
         $upload_dir = wp_upload_dir();
         self::$iconsDir = $upload_dir['basedir'] . '/ei-icons';
         self::$iconsUrl = $upload_dir['baseurl'] . '/ei-icons';
+        self::$pluginAssetsDir = EasyIcon::$pluginDirPath . 'assets/ei-icons/';
 
         $this->initializeIcons();
     }
@@ -34,6 +36,18 @@ class IconHandler {
 
         self::generateUnifiedFontCSS();
         self::enqueueUnifiedFontCSS();
+    }
+
+    public static function getPluginAssets(): array {
+        $assets = [];
+
+        if (is_dir(self::$pluginAssetsDir)) {
+            $assets = self::getAllFilesAndDirs(self::$pluginAssetsDir);
+        } else {
+            error_log('Plugin assets directory does not exist: ' . self::$pluginAssetsDir);
+        }
+
+        return $assets;
     }
 
      /**
@@ -213,7 +227,7 @@ class IconHandler {
     }
 
     private static function copyFontsFromAssets(): void {
-        $plugin_assets_dir = EasyIcon::$pluginDirPath . 'assets/ei-icons/';
+        self::$pluginAssetsDir;
 
         if (!is_dir($plugin_assets_dir)) {
             error_log('Error: Plugin assets directory does not exist.');
