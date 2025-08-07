@@ -2,6 +2,7 @@ const { __ } = wp.i18n;
 const { useState, useEffect } = wp.element;
 const { TextControl, PanelBody, PanelRow, ColorPicker } = wp.components;
 const { BlockControls, AlignmentToolbar, InspectorControls } = wp.blockEditor;
+const { useBlockProps } = wp.blockEditor;
 
 export default function Edit({ attributes, setAttributes }) {
     const { fontSize, lineHeight, align, backgroundColor, textColor, className } = attributes;
@@ -74,6 +75,17 @@ export default function Edit({ attributes, setAttributes }) {
         setShowFontSelection(prevState => !prevState);
     };
 
+    const blockProps = useBlockProps({
+        style: {
+            fontSize: fontSize ? `${fontSize}px` : undefined,
+            lineHeight: lineHeight ? `${lineHeight}px` : undefined,
+            backgroundColor: backgroundColor || undefined,
+            color: textColor || undefined,
+        }
+    });
+
+    const wrapperClass = `selected-icon-wrapper align${align}`;
+    
     return (
          <>
             <BlockControls>
@@ -126,16 +138,9 @@ export default function Edit({ attributes, setAttributes }) {
                     </PanelRow>
                 </PanelBody>
             </InspectorControls>
+            
 
-            <div
-                className={`selected-icon-wrapper align${align}`}
-                style={{
-                    fontSize: fontSize ? `${fontSize}px` : undefined,
-                    lineHeight: lineHeight ? `${lineHeight}px` : undefined,
-                    backgroundColor: backgroundColor || undefined,
-                    color: textColor || undefined,
-                }}
-            >
+            <div {...blockProps} className={`${blockProps.className} ${wrapperClass}`}>
                 {selectedIcon.className ? (
                     <span
                         className={selectedIcon.className}

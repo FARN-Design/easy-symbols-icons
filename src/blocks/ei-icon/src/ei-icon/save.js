@@ -4,17 +4,18 @@ const { useBlockProps } = wp.blockEditor;
 export default function Save({ attributes }) {
     const { className, fontSize, lineHeight, backgroundColor, textColor, align } = attributes;
 
+    const blockProps = useBlockProps.save({
+        className: `selected-icon-wrapper align${align}`,
+        style: {
+            fontSize: fontSize ? `${fontSize}px` : undefined,
+            lineHeight: lineHeight ? `${lineHeight}px` : undefined,
+            backgroundColor: backgroundColor || undefined,
+            color: textColor || undefined,
+        }
+    });
+
     return (
-        <div
-            {...useBlockProps.save()}
-            className={`selected-icon-wrapper align${align}`}
-            style={{
-                fontSize: fontSize ? `${fontSize}px` : undefined,
-                lineHeight: lineHeight ? `${lineHeight}px` : undefined,
-                backgroundColor: backgroundColor || undefined,
-                color: textColor || undefined,
-            }}
-        >
+        <div {...blockProps}>
             {className ? (
                 <span className={className}></span>
             ) : (

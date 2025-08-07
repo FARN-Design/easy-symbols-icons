@@ -43,6 +43,9 @@ const {
   AlignmentToolbar,
   InspectorControls
 } = wp.blockEditor;
+const {
+  useBlockProps
+} = wp.blockEditor;
 function Edit({
   attributes,
   setAttributes
@@ -117,6 +120,15 @@ function Edit({
   const toggleFontSelection = () => {
     setShowFontSelection(prevState => !prevState);
   };
+  const blockProps = useBlockProps({
+    style: {
+      fontSize: fontSize ? `${fontSize}px` : undefined,
+      lineHeight: lineHeight ? `${lineHeight}px` : undefined,
+      backgroundColor: backgroundColor || undefined,
+      color: textColor || undefined
+    }
+  });
+  const wrapperClass = `selected-icon-wrapper align${align}`;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(BlockControls, {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(AlignmentToolbar, {
@@ -167,13 +179,8 @@ function Edit({
         })]
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-      className: `selected-icon-wrapper align${align}`,
-      style: {
-        fontSize: fontSize ? `${fontSize}px` : undefined,
-        lineHeight: lineHeight ? `${lineHeight}px` : undefined,
-        backgroundColor: backgroundColor || undefined,
-        color: textColor || undefined
-      },
+      ...blockProps,
+      className: `${blockProps.className} ${wrapperClass}`,
       children: selectedIcon.className ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
         className: selectedIcon.className,
         style: {
@@ -287,15 +294,17 @@ function Save({
     textColor,
     align
   } = attributes;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-    ...useBlockProps.save(),
+  const blockProps = useBlockProps.save({
     className: `selected-icon-wrapper align${align}`,
     style: {
       fontSize: fontSize ? `${fontSize}px` : undefined,
       lineHeight: lineHeight ? `${lineHeight}px` : undefined,
       backgroundColor: backgroundColor || undefined,
       color: textColor || undefined
-    },
+    }
+  });
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+    ...blockProps,
     children: className ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
       className: className
     }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", {
