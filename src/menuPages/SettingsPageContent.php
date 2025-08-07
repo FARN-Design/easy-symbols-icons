@@ -33,23 +33,28 @@ switch ($tab) {
     }
 }
 
-function displayGeneralTab(){
+function displayGeneralTab() {
     ?>
     <div class="wrap">
         <hr class="wp-header-end">
-        <form method="post" name="general_setting" id="general_setting" action="">
-            <table class="form-table">
-                <thead>
-<!--                    TODO-->
-                </thead>
-                <tbody>
-<!--                    TODO-->
-                </tbody>
-            </table>
-        </form>
+        <h2><?php echo __("General Settings", "easyicon"); ?></h2>
+        <p><?php echo __("With EasyIcon, you can easily manage icon fonts for your website. Select from preloaded fonts or upload your own custom fonts in TTF or OTF format.", "easyicon"); ?></p>
+
+        <h3><?php echo __("Upload Custom Fonts", "easyicon"); ?></h3>
+        <p><?php echo __("You can upload your custom fonts by heading to the Font Select tab. Once uploaded, your fonts will be available for use within the site.", "easyicon"); ?></p>
+
+        <h3><?php echo __("Using Icons", "easyicon"); ?></h3>
+        <p><?php echo __("To add an icon to your content, use the 'ei-icon' block. When you click on the block, an icon select menu will appear, allowing you to choose from your selected or custom fonts.", "easyicon"); ?></p>
+
+        <h3><?php echo __("Tips", "easyicon"); ?></h3>
+        <ul>
+            <li><?php echo __("Custom fonts can only be TTF or OTF format.", "easyicon"); ?></li>
+            <li><?php echo __("Don't forget to save your settings after uploading or selecting your fonts.", "easyicon"); ?></li>
+        </ul>
     </div>
-<?php
+    <?php
 }
+
     function displayFontSelectTab() {
     ?>
     <div class="wrap">
@@ -69,6 +74,40 @@ function displayGeneralTab(){
                 if (in_array(strtolower($extension), ['ttf', 'otf'])) {
                     $plugin_fonts[] = basename($asset);
                 }
+            }
+
+            $font_mappings = IconHandler::getLoadedFontGlyphsMapping();
+
+            $unicode_map = [];
+            $conflicts = [];
+
+            foreach ($font_mappings as $font_folder => $glyphs) {
+                foreach ($glyphs as $glyph) {
+                    $unicode = $glyph[1];
+
+                    if (isset($unicode_map[$unicode])) {
+                        $unicode_map[$unicode][] = $font_folder;
+                    } else {
+                        $unicode_map[$unicode] = [$font_folder];
+                    }
+                }
+            }
+
+            foreach ($unicode_map as $unicode => $fonts) {
+                if (count($fonts) > 1) {
+                    $conflicts[$unicode] = $fonts;
+                }
+            }
+
+            if (!empty($conflicts)) {
+                echo '<div class="error notice"><p>';
+                echo __("There are icon Unicode conflicts in the following fonts:", "easyicon") . '<br>';
+
+                foreach ($conflicts as $unicode => $conflicting_fonts) {
+                    echo "<strong>Unicode $unicode:</strong> " . implode(', ', $conflicting_fonts) . '<br>';
+                }
+
+                echo '</p></div>';
             }
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['easyicon_fonts_nonce']) && wp_verify_nonce($_POST['easyicon_fonts_nonce'], 'save_easyicon_fonts')) {

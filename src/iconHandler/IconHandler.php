@@ -22,6 +22,11 @@ class IconHandler {
         $this->initializeIcons();
     }
 
+    /**
+     * Get the instance of the IconHandler class.
+     *
+     * @return IconHandler The instance of the IconHandler class.
+     */
     public static function getInstance(): IconHandler {
         if ( ! isset( self::$instance ) ) {
 			self::$instance = new self();
@@ -30,6 +35,13 @@ class IconHandler {
 		return self::$instance;
     }
 
+    /**
+     * Initializes icons by creating required folders and copying font assets.
+     * 
+     * This method also generates and enqueues the unified CSS for icons.
+     *
+     * @return void
+     */
     public static function initializeIcons(): void {
         self::createIconFolder();
 
@@ -39,6 +51,11 @@ class IconHandler {
         self::enqueueUnifiedFontCSS();
     }
 
+    /**
+     * Retrieves all plugin assets in the plugin assets directory.
+     *
+     * @return array An array of file paths for the plugin assets.
+     */
     public static function getPluginAssets(): array {
         $assets = [];
 
@@ -83,11 +100,13 @@ class IconHandler {
         return false;
     }
 
-    private static function isValidFontType(string $fontName): bool {
-        $allowedExtensions = ['ttf', 'otf'];
-        return in_array(pathinfo($fontName, PATHINFO_EXTENSION), $allowedExtensions, true);
-    }
-
+    /**
+     * Removes a font from the system, deleting all its font files.
+     *
+     * @param string $fontFolder The name of the font folder to remove.
+     * 
+     * @return bool Returns true on success, false if the font folder does not exist.
+     */
     public static function removeFont(string $fontFolder): bool {
         $font_dir = self::$iconsDir . '/' . $fontFolder;
 
@@ -113,17 +132,13 @@ class IconHandler {
         return true;
     }
 
-    public static function getFontIcons(string $fontFolder): array {
-        $fontDir = self::$iconsDir . '/' . $fontFolder;
-        $fontFiles = glob($fontDir . '/*.{ttf,otf}', GLOB_BRACE);
-
-        if (empty($fontFiles)) {
-            return [];
-        }
-
-        return self::parseFontFile($fontFiles[0]);
-    }
-
+    /**
+     * Retrieves all available fonts in the plugin's icon directory.
+     * 
+     * The method returns all fonts (directories containing .ttf or .otf files) found in the icon directory.
+     *
+     * @return array An associative array with font folder names as keys and folder names as values.
+     */
     public static function getAvailableFonts(): array {
         $fonts = [];
 
@@ -150,14 +165,21 @@ class IconHandler {
         return $fonts;
     }
 
+    /**
+     * Retrieves all fonts that are currently loaded (saved in the settings).
+     *
+     * @return array An array of loaded font folder names.
+     */
     public static function getLoadedFonts(): array {
-        $loaded_fonts_json = Settings::getSettingFromDB('loaded_fonts');
-        
-        $loaded_fonts = json_decode($loaded_fonts_json, true) ?? [];
-    
-        return $loaded_fonts;
+        $loadedFontsJson = Settings::getSettingFromDB('loaded_fonts');
+        return json_decode($loadedFontsJson, true) ?? [];
     }
 
+    /**
+     * Retrieves a mapping of font glyphs (names and Unicode) for all loaded fonts.
+     *
+     * @return array An associative array where keys are font folder names and values are arrays of glyph mappings.
+     */
     public static function getLoadedFontGlyphsMapping(): array {
         $font_mappings = [];
 
@@ -199,12 +221,36 @@ class IconHandler {
         return $font_mappings;
     }
 
+    // Private Helper Functions
+
+    /**
+     * Validates if the font file is of a valid type (TTF or OTF).
+     *
+     * @param string $fontName The name of the font file.
+     * 
+     * @return bool True if the font type is valid, false otherwise.
+     */
+    private static function isValidFontType(string $fontName): bool {
+        $allowedExtensions = ['ttf', 'otf'];
+        return in_array(pathinfo($fontName, PATHINFO_EXTENSION), $allowedExtensions, true);
+    }
+
+    /**
+     * Creates the icon directory if it doesn't exist.
+     *
+     * @return void
+     */
     private static function createIconFolder(): void {
         if (!file_exists(self::$iconsDir)) {
             wp_mkdir_p(self::$iconsDir);
         }
     }
 
+    /**
+     * Copies the font files from the plugin's assets folder to the icons directory.
+     *
+     * @return void
+     */
     private static function copyFontsFromAssets(): void {
         $plugin_assets_dir = self::$pluginAssetsDir;
 
@@ -236,6 +282,13 @@ class IconHandler {
         }
     }
 
+    /**
+     * Recursively retrieves all files and directories in a given directory.
+     *
+     * @param string $dir The directory to scan.
+     *
+     * @return array An array of file paths for all items in the directory.
+     */
     private static function getAllFilesAndDirs(string $dir): array {
         $results = [];
 
@@ -256,6 +309,13 @@ class IconHandler {
         return $results;
     }
 
+    /**
+     * Parses a font file to retrieve its glyphs (names and Unicode).
+     *
+     * @param string $fontFile The path to the font file.
+     * 
+     * @return array An associative array where keys are glyph names and values are Unicode hex codes.
+     */
     private static function parseFontFile(string $fontFile): array {
         try {
             $font = Font::load($fontFile);
@@ -278,7 +338,11 @@ class IconHandler {
         return [];
     }
 
-
+    /**
+     * Generates a unified CSS file for the loaded fonts and their glyphs.
+     *
+     * @return void
+     */
     private static function generateUnifiedFontCSS(): void {
         $enabled_fonts_json = Settings::getSettingFromDB('loaded_fonts');
         $enabled_fonts = json_decode($enabled_fonts_json, true);
@@ -298,46 +362,37 @@ class IconHandler {
 
         $css_output = '';
 
-        foreach ($enabled_fonts as $fontFolder) {
-            $font_dir = self::$iconsDir . '/' . $fontFolder . '/';
-            if (!is_dir($font_dir)) {
+        $font_mappings = self::getLoadedFontGlyphsMapping();
+
+        foreach ($font_mappings as $fontFolder) {
+            if (empty($fontFolder)) {
+                error_log("Skipping empty or invalid font folder" . $fontFolder);
                 continue;
             }
 
-            $font_files = glob($font_dir . '*.{ttf,otf}', GLOB_BRACE);
+            $font_dir = self::$iconsDir . '/' . $fontFolder;
+            $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+
             if (empty($font_files)) {
                 continue;
             }
 
             $font_file = $font_files[0];
+            
             try {
-                $font = Font::load($font_file);
-                $font->parse();
-
-                $font_name = $font->getFontName();
-                $char_map = $font->getUnicodeCharMap();
-                $font_glyphs = $font->getData('post', "names");
+                $font_name = Font::load($font_file)->getFontName();
 
                 $css_output .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($font_file) ."') format('truetype');}";
                 $css_output .= '[class^="ei-' . strtolower($fontFolder) . '-"]{font-family:"' . $font_name . '";}';
 
-                foreach ($char_map as $unicode => $glyphIndex) {
-                    if (isset($font_glyphs[$glyphIndex])) {
-                        $glyph = $font_glyphs[$glyphIndex];
-                        $glyph_name = $glyph;
-                    } else {
-                        $glyph_name = 'uni' . strtoupper(dechex($unicode));
-                    }
-
-                    $unicode_hex = sprintf('\\%04x', $unicode);
+                foreach ($font_mappings[$fontFolder] as $glyph_mapping) {
+                    $glyph_name = $glyph_mapping[0];
+                    $unicode_hex = $glyph_mapping[1];
                     $class = '.ei-' . strtolower($fontFolder) . '-' . strtolower($glyph_name);
                     $css_output .= "{$class}::before{content:\"{$unicode_hex}\";}";
                 }
-
-                $rel_path = self::$iconsUrl . '/' . $fontFolder . '/' . basename($font_file);
-
             } catch (\Exception $e) {
-                error_log("Font parse error: " . $e->getMessage());
+                error_log("Font parse error for '{$fontFolder}': " . $e->getMessage());
             }
         }
         if ($css_output) {
@@ -348,6 +403,11 @@ class IconHandler {
         update_option('ei_prev_loaded_fonts', json_encode($enabled_fonts));
     }
 
+    /**
+     * Enqueues the unified CSS file for the loaded fonts.
+     *
+     * @return void
+     */
     private static function enqueueUnifiedFontCSS(): void {
         $upload_dir = wp_upload_dir();
         $css_file_url = self::$iconsUrl . '/generated-icons.css';
