@@ -43,9 +43,10 @@ class IconHandler {
      * @return void
      */
     public static function initializeIcons(): void {
-        self::createIconFolder();
-
-        self::copyFontsFromAssets();
+        if (!self::doesIconsDirectoryExist()) {
+            self::createIconFolder();
+            self::copyFontsFromAssets();
+        }
 
         self::generateUnifiedFontCSS();
         self::enqueueUnifiedFontCSS();
@@ -224,6 +225,24 @@ class IconHandler {
     // Private Helper Functions
 
     /**
+     * Checks if the icons directory exists (uploads/ei-icons) and is not empty.
+     *
+     * @return bool True if the icons directory exists and is not empty, false otherwise.
+     */
+    private static function doesIconsDirectoryExist(): bool {
+        // Check if the directory exists
+        if (!is_dir(self::$iconsDir)) {
+            return false;
+        }
+
+        // Use the getAllFilesAndDirs function to get all files and directories inside the icons directory
+        $filesAndDirs = self::getAllFilesAndDirs(self::$iconsDir);
+
+        // If the result is empty, the directory is considered empty
+        return !empty($filesAndDirs);
+    }
+
+    /**
      * Validates if the font file is of a valid type (TTF or OTF).
      *
      * @param string $fontName The name of the font file.
@@ -275,9 +294,9 @@ class IconHandler {
             }
 
             if (self::addFont($fontBlob, $fontName)) {
-                error_log("Successfully copied font from assets: {$font_name}");
+                error_log("Successfully copied font from assets: {$fontName}");
             } else {
-                error_log("Failed to copy font from assets: {$font_name}");
+                error_log("Failed to copy font from assets: {$fontName}");
             }
         }
     }

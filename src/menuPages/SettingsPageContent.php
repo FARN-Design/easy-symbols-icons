@@ -67,15 +67,6 @@ function displayGeneralTab() {
 
             $available_fonts = IconHandler::getAvailableFonts();
 
-            $plugin_assets = IconHandler::getPluginAssets();
-            $plugin_fonts = [];
-            foreach ($plugin_assets as $asset) {
-                $extension = pathinfo($asset, PATHINFO_EXTENSION);
-                if (in_array(strtolower($extension), ['ttf', 'otf'])) {
-                    $plugin_fonts[] = basename($asset);
-                }
-            }
-
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['easyicon_fonts_nonce']) && wp_verify_nonce($_POST['easyicon_fonts_nonce'], 'save_easyicon_fonts')) {
                 $fonts = $_POST['loaded_fonts'] ?? [];
                 Settings::saveSettingInDB('loaded_fonts', json_encode($fonts));
@@ -125,13 +116,9 @@ function displayGeneralTab() {
                             <input type="checkbox" name="loaded_fonts[]" value="<?php echo esc_attr($font_folder); ?>" <?php checked(in_array($font_folder, $selected_fonts)); ?>>
                             <?php echo esc_html($font_label); ?>
                         </label><br>
-                        <?php
-                        if (!in_array($font_folder . '.ttf', $plugin_fonts) && !in_array($font_folder . '.otf', $plugin_fonts)):
-                        ?>
-                            <button type="button" class="button button-secondary remove-font" data-font="<?php echo esc_attr($font_folder); ?>">
+                        <button type="button" class="button button-secondary remove-font" data-font="<?php echo esc_attr($font_folder); ?>">
                                 <?php echo __("Remove", "easyicon"); ?>
-                            </button>
-                        <?php endif; ?>
+                        </button>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
