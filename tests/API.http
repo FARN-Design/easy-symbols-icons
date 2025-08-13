@@ -1,0 +1,4 @@
+### GET request to example server
+GET https://dev2.farn.space/wp-json/es/v1/get-locations?post_type=post&lat_key=lat&lng_key=lng&post_ids[]=15
+
+###
