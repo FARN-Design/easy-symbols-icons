@@ -13,6 +13,12 @@ class IconHandler {
     public static string $iconsUrl;
     private static string $pluginAssetsDir;
 
+    /**
+     * Private constructor to initialize the IconHandler.
+     *
+     * Sets directory paths for icon storage and plugin assets,
+     * and initializes icons by creating necessary folders and copying default fonts.
+     */
     private function __construct() {
         $upload_dir = wp_upload_dir();
         self::$iconsDir = $upload_dir['basedir'] . '/ei-icons';
