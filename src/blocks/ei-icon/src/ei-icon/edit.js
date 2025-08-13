@@ -3,6 +3,7 @@ const { useState, useEffect } = wp.element;
 const { TextControl } = wp.components;
 const { BlockControls, AlignmentToolbar } = wp.blockEditor;
 const { useBlockProps } = wp.blockEditor;
+import './editor.scss';
 
 function generateRandomHash() {
     return Math.random().toString(36).substr(2, 9) + Date.now().toString(36).substr(2, 5);
@@ -113,16 +114,15 @@ export default function Edit({ attributes, setAttributes }) {
                 <div className="ei-icon-grid" id={selectorID} popover="true">
                     <div className="ei-icon-search">
                         <TextControl
-                            label={__('Search Icons', 'easyicon')}
                             value={searchTerm}
                             onChange={(value) => setSearchTerm(value)}
-                            placeholder={__('Search by glyph name...', 'easyicon')}
+                            placeholder={__('search icon by glyph name...', 'easyicon')}
                         />
                     </div>
 
+                    <div className="ei-icon-font-selects">
                     {loading && <p>{__('Loading fonts...', 'easyicon')}</p>}
                     {error && <p>{__('Error: ', 'easyicon')}{error}</p>}
-
                     {!loading && !error && filteredFonts.length > 0 && (
                         filteredFonts.map((font, index) => (
                             <details key={index} className="ei-font-details">
@@ -146,6 +146,7 @@ export default function Edit({ attributes, setAttributes }) {
                             </details>
                         ))
                     )}
+                    </div>
 
                     {!loading && !error && filteredFonts.length === 0 && (
                         <p>{__('No fonts found', 'easyicon')}</p>
