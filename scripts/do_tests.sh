@@ -17,9 +17,9 @@ npm install
 echo -e "${GREEN}3. Setting up WordPress test environment...${NC}"
 yes y | bash scripts/install-wp-tests.sh \
     wp_test_db \
-    wp_test_db_user \
-    'wp_test_f430ab33568392cf1d045706af16dfce' \
-    tanne.farn.de:3307 \
+    wp_test_user \
+    wp_test_password \
+    127.0.0.1:3306 \
     latest
 
 echo -e "${GREEN}4. Running PHPUnit tests...${NC}"
