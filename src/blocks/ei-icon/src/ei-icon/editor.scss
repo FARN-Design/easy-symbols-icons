@@ -1,4 +1,4 @@
-.ei-icon-grid {
+.ei-icon-grid:popover-open {
 	display: flex;
 	flex-wrap: wrap;
 	padding:0;
@@ -9,6 +9,8 @@
 	background-color: white;
 	z-index: 10;
 	max-height: 90vh;
+	margin-block-start: auto !important;
+	margin-block-end: auto !important;
 }
 .ei-icon-item {
 	width: 40px;
