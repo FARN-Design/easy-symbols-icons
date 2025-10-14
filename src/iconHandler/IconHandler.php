@@ -447,7 +447,6 @@ class IconHandler {
         $previous_loaded_fonts = json_decode($previous_loaded_fonts_json, true);
 
         if ($enabled_fonts === $previous_loaded_fonts) {
-            error_log("No new loaded fonts, skipping css regeneration...");
             return;
         }
 

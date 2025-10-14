@@ -28,8 +28,6 @@ class Blocks {
 			$block_registered = register_block_type(__DIR__ . '/ei-icon/build/ei-icon');
 
             if ($block_registered) {
-                error_log("Block registered successfully: " . $block_registered->name);
-
                 add_action('rest_api_init', function() {
                     register_rest_route('easyicon/v1', '/fonts', [
                         'methods' => 'GET',
