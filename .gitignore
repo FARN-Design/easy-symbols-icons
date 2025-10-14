@@ -5,5 +5,6 @@ wp-tests-lib
 /.phpunit.result.cache
 .vscode/*
 **/build/**
+src/blocks/ei-icon/build/
 
 .idea/*

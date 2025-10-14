@@ -52,7 +52,9 @@ export default function Edit({ attributes, setAttributes }) {
     const filteredFonts = Object.keys(fonts).map(fontFolder => {
         const fontArray = fonts[fontFolder];
 
-        const filteredGlyphs = fontArray.filter(([name]) => {
+        const fontEntries = Object.entries(fontArray); 
+
+        const filteredGlyphs = fontEntries.filter(([name]) => {
             return name.toLowerCase().includes(searchTerm.toLowerCase());
         });
 

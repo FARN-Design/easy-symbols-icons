@@ -213,13 +213,30 @@ class IconHandler {
 
                 $glyphs_mapping = [];
 
-                foreach ($char_map as $unicode => $glyphIndex) {
-                    $glyph_name = isset($font_glyphs[$glyphIndex]) ? $font_glyphs[$glyphIndex] : 'uni' . strtoupper(dechex($unicode));
+                if (!empty($char_map) && !empty($font_glyphs)) {
+                    foreach ($char_map as $unicode => $glyphIndex) {
+                        $glyph_name = isset($font_glyphs[$glyphIndex]) ? $font_glyphs[$glyphIndex] : 'uni' . strtoupper(dechex($unicode));
+                        $glyphs_mapping[strtolower($glyph_name)] = '\\' . dechex($unicode);
+                    }
+                } else {
+                    $ligature_map = self::extractLigatureMapping($font);
 
-                    $glyphs_mapping[] = [strtolower($glyph_name), '\\' . dechex($unicode)];
+                    if (!empty($ligature_map)) {
+                        foreach ($ligature_map as $seq => $unicode) {
+                            $glyphs_mapping[$seq] = $unicode;
+                        }
+                    } else {
+                        error_log("Both char_map and ligature_map are empty for font '{$fontFolder}'");
+                        foreach ($char_map as $unicode => $glyphIndex) {
+                            $glyphs_mapping['uni' . strtoupper(dechex($unicode))] = '\\' . dechex($unicode);
+                        }
+                    }
                 }
 
-                $font_mappings[$fontFolder] = $glyphs_mapping;
+                if (!empty($glyphs_mapping)) {
+                    $font_mappings[$fontFolder] = $glyphs_mapping;
+                }
+
             } catch (\Exception $e) {
                 error_log("Error loading font icons for '{$fontFolder}': " . $e->getMessage());
             }
@@ -364,6 +381,67 @@ class IconHandler {
     }
 
     /**
+     * Extracts ligature mappings from a font file.
+     * 
+     * @param Font $font The loaded font object.
+     * @return array Mapping of actual character sequences to Unicode strings (e.g., "icon_name" => "U+E001").
+     */
+    private static function extractLigatureMapping($font): array {
+        $cmap = $font->getData("cmap")['subtables'][0]['glyphIndexArray'] ?? [];
+        $glyphIDtoChar = [];
+        $glyphIDtoUnicode = [];
+        foreach ($cmap as $unicode => $gid) {
+            if ($gid !== 0) {
+                $glyphIDtoChar[$gid] = mb_chr($unicode, 'UTF-8');
+                $glyphIDtoUnicode[$gid] = '\\' . strtoupper(dechex($unicode));
+            }
+        }
+
+        $ligatureMap = [];
+        $gsub = $font->getData("GSUB");
+
+        foreach ($gsub['lookupList']['lookups'] as $lookup) {
+            if ($lookup['lookupType'] !== 4) continue;
+
+            foreach ($lookup['subtables'] as $subtable) {
+                if (!isset($subtable['ligSets'])) continue;
+
+                $leadingGlyphs = [];
+                if (!empty($subtable['coverage']['rangeRecords'])) {
+                    foreach ($subtable['coverage']['rangeRecords'] as $range) {
+                        for ($gid = $range['start']; $gid <= $range['end']; $gid++) {
+                            $leadingGlyphs[] = $gid;
+                        }
+                    }
+                }
+                if (!empty($subtable['coverageGlyphs'])) {
+                    foreach ($subtable['coverageGlyphs'] as $gid) {
+                        $leadingGlyphs[] = $gid;
+                    }
+                }
+
+                foreach ($subtable['ligSets'] as $index => $ligSet) {
+                    $baseGid = $leadingGlyphs[$index] ?? null;
+                    if ($baseGid === null) continue;
+
+                    foreach ($ligSet['ligatures'] as $lig) {
+                        $componentChars = array_map(fn($gid) => $glyphIDtoChar[$gid] ?? '', $lig['components']);
+                        array_unshift($componentChars, $glyphIDtoChar[$baseGid] ?? '');
+                        $seqStr = implode('', $componentChars);
+
+                        $ligatureGlyph = $glyphIDtoUnicode[$lig['ligatureGlyph']] ?? null;
+                        if ($ligatureGlyph !== null) {
+                            $ligatureMap[$seqStr] = $ligatureGlyph;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $ligatureMap;
+    }
+
+    /**
      * Generates a unified CSS file for the loaded fonts and their glyphs.
      *
      * @return void
@@ -408,10 +486,7 @@ class IconHandler {
 
                 $css_output .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($font_file) ."') format('truetype');}";
                 $css_output .= '[class^="ei-' . strtolower($fontFolder) . '-"]{font-family:"' . $font_name . '";}';
-                error_log("t1");
-                foreach ($font_mappings[$fontFolder] as $glyph_mapping) {
-                    $glyph_name = $glyph_mapping[0];
-                    $unicode_hex = $glyph_mapping[1];
+                foreach ($font_mappings[$fontFolder] as $glyph_name => $unicode_hex) {
                     $class = '.ei-' . strtolower($fontFolder) . '-' . strtolower($glyph_name);
                     $css_output .= "{$class}::before{content:\"{$unicode_hex}\";}";
                 }
