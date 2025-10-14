@@ -129,7 +129,11 @@ function displayFontSelectTab() {
                 echo '<div class="updated notice"><p>' . __("Settings saved.", "easyicon") . '</p></div>';
             }
 
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_font_nonce']) && wp_verify_nonce($_POST['remove_font_nonce'], 'remove_easyicon_font')) {
+            if (
+                $_SERVER['REQUEST_METHOD'] === 'POST' &&
+                isset($_POST['remove_font_nonce'], $_POST['font_to_remove']) &&
+                wp_verify_nonce($_POST['remove_font_nonce'], 'remove_easyicon_font')
+            ) {
                 if (isset($_POST['font_to_remove'])) {
                     $font_to_remove = sanitize_text_field($_POST['font_to_remove']);
                     if (!empty($font_to_remove)) {
