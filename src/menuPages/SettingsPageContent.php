@@ -16,6 +16,9 @@ if (!$iconDirExists): ?>
         <div style="background:#fff; padding:2em; border-radius:8px; max-width:400px; text-align:center;">
             <h2><?php echo __("No Icon Fonts Available", "easyicon"); ?></h2>
             <p><?php echo __("No icon fonts are currently installed. You can choose to download a set of default fonts from external sources, or upload your own custom fonts instead.", "easyicon"); ?></p>
+            <div style="background:#f1f1f1; color:#555; font-size:0.85em; padding:0.75em; margin:1em 0; border-radius:4px; text-align:left;">
+                <?php echo __("Note: Default fonts will be downloaded from trusted sources only – JSDelivr CDN and the official WordPress Dashicons GitHub repository.", "easyicon"); ?>
+            </div>
             <button id="download-default-fonts" class="button button-primary">
                 <?php echo __("Download Default Fonts", "easyicon"); ?>
             </button>
