@@ -24,7 +24,7 @@ export default function Edit({ attributes, setAttributes }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('/wp-json/easyicon/v1/available-fonts');
+                const response = await fetch('/wp-json/easyicon/v1/loaded-fonts');
                 
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -88,7 +88,20 @@ export default function Edit({ attributes, setAttributes }) {
 
     const wrapperClass = `selected-icon-wrapper align${align}`;
     const selectorID = `ei-icon-grid-${blockId}`;
-    
+
+    const isIconValid = (iconClassName, loadedFonts) => {
+        for (const fontFolder in loadedFonts) {
+            const fontGlyphs = loadedFonts[fontFolder];
+            for (const glyphName in fontGlyphs) {
+                const expectedClass = `ei-${fontFolder.toLowerCase()}-${glyphName}`;
+                if (iconClassName === expectedClass) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
     return (
          <>
             <BlockControls>
@@ -99,7 +112,7 @@ export default function Edit({ attributes, setAttributes }) {
             </BlockControls>
 
             <div {...blockProps} className={`${blockProps.className} ${wrapperClass}`}>
-                {selectedIcon.className ? (
+                {selectedIcon.className && isIconValid(selectedIcon.className, fonts) ? (
                     <button
                         className={selectedIcon.className}
                         style={{ cursor: 'pointer' }}

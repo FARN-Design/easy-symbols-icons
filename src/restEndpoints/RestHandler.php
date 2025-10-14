@@ -16,9 +16,9 @@ class RestHandler {
      * Register all REST API routes.
      */
     public static function register_routes() {
-        register_rest_route('easyicon/v1', '/available-fonts', [
+        register_rest_route('easyicon/v1', '/loaded-fonts', [
             'methods'  => 'GET',
-            'callback' => [self::class, 'get_available_fonts'],
+            'callback' => [self::class, 'get_loaded_fonts'],
             'permission_callback' => '__return_true',
         ]);
 
@@ -36,7 +36,7 @@ class RestHandler {
      *
      * @return WP_REST_Response
      */
-    public static function get_available_fonts() {
+    public static function get_loaded_fonts() {
         $fontGlyphs = IconHandler::getLoadedFontGlyphsMapping();
 
         if (is_array($fontGlyphs)) {
