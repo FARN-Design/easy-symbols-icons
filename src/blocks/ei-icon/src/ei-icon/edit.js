@@ -52,7 +52,9 @@ export default function Edit({ attributes, setAttributes }) {
     const filteredFonts = Object.keys(fonts).map(fontFolder => {
         const fontArray = fonts[fontFolder];
 
-        const filteredGlyphs = fontArray.filter(([name]) => {
+        const fontEntries = Object.entries(fontArray); 
+
+        const filteredGlyphs = fontEntries.filter(([name]) => {
             return name.toLowerCase().includes(searchTerm.toLowerCase());
         });
 
@@ -129,7 +131,7 @@ export default function Edit({ attributes, setAttributes }) {
                                 <summary>{font.fontFolder}</summary>
                                 <div className="ei-font-icons">
                                     {font.glyphs.map(([name], i) => {
-                                        const iconClass = `ei-${font.fontFolder.toLowerCase()}-${name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`;
+                                        const iconClass = `ei-${font.fontFolder.toLowerCase()}-${name}`;
 
                                         return (
                                             <span
