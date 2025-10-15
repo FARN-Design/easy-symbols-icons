@@ -9,7 +9,6 @@ class Settings
 {
 	private static wpdb $wpdb;
 	private static string $tableName;
-	private static Settings $instance;
 
 	public static function setup(): void {
 		global $wpdb;
