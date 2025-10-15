@@ -26,18 +26,6 @@ class Blocks {
 	public static function setup() {
 		add_action( 'init', function () {
 			$block_registered = register_block_type(__DIR__ . '/ei-icon/build/ei-icon');
-
-            if ($block_registered) {
-                add_action('rest_api_init', function() {
-                    register_rest_route('easyicon/v1', '/fonts', [
-                        'methods' => 'GET',
-                        'callback' => [self::class, 'get_available_fonts'],
-                        'permission_callback' => '__return_true',
-                    ]);
-                });
-            } else {
-                error_log("Block registration failed.");
-            }
 		} );
     }
 }

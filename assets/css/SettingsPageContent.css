@@ -1,0 +1,51 @@
+#default-fonts-popup {
+  display: none; /* Hidden by default, shown via JS */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6); /* dark translucent background */
+  z-index: 10000;
+  display: flex; /* use flexbox to center content */
+  justify-content: center;
+  align-items: center;
+}
+
+#default-fonts-popup > div {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+#default-fonts-popup h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+#default-fonts-popup p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+#default-fonts-popup > div > div {
+  background: #f1f1f1;
+  color: #555;
+  font-size: 0.85rem;
+  padding: 0.75rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  text-align: left;
+}
+
+#default-fonts-popup button {
+  margin: 0.5rem 0.25rem;
+  min-width: 140px;
+  cursor: pointer;
+}
