@@ -14,6 +14,20 @@ Domain Path: src/resources/language
 
 require __DIR__ . '/vendor/autoload.php';
 
+// Fallback autoloader for FontLib when Composer's autoload doesn't register it (e.g., custom package install without autoload metadata)
+if (!class_exists(\FontLib\Font::class)) {
+    spl_autoload_register(function ($class) {
+        if (strpos($class, 'FontLib\\') === 0) {
+            $baseDir = __DIR__ . '/vendor/phenx/php-font-lib/src/';
+            $relativePath = str_replace('\\', '/', $class) . '.php';
+            $file = $baseDir . $relativePath;
+            if (is_file($file)) {
+                require $file;
+            }
+        }
+    });
+}
+
 use Farn\EasyIcon\database\Settings;
 use Farn\EasyIcon\menuPages\SettingsPage;
 use Farn\EasyIcon\blocks\Blocks;

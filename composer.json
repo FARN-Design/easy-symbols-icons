@@ -22,6 +22,11 @@
               "url": "https://github.com/NLion74/php-font-lib",
               "type": "git",
               "reference": "master"
+            },
+            "autoload": {
+              "psr-4": {
+                "FontLib\\": "src/FontLib"
+              }
             }
           }
         }
