@@ -1,9 +1,9 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "easyicon/ei-icon",
+	"name": "easyiconfonts/eif-icon-fonts",
 	"version": "0.1.0",
-	"title": "Ei Icon",
+	"title": "Easy Icon Fonts",
 	"category": "widgets",
 	"icon": "format",
 	"description": "Insert an icon from enabled icon fonts.",
@@ -20,8 +20,8 @@
 			"lineHeight": true
 		}
 	},
-	"keywords": ["icon", "loader", "font", "ei-icon"],
-	"textdomain": "ei-icon",
+	"keywords": ["icon", "loader", "font", "eif-icon"],
+	"textdomain": "eif-icon",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",

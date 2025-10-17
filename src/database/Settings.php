@@ -1,6 +1,6 @@
 <?php
 
-namespace Farn\EasyIcon\database;
+namespace Farn\EasyIconFonts\database;
 
 use EasyIcon;
 use wpdb;
@@ -9,7 +9,6 @@ class Settings
 {
 	private static wpdb $wpdb;
 	private static string $tableName;
-	private static Settings $instance;
 
 	public static function setup(): void {
 		global $wpdb;

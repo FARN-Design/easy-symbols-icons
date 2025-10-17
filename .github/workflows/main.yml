@@ -94,10 +94,10 @@ jobs:
       # Set environment variables
       - name: Setup ENV
         run: | 
-          echo "pluginSlug=easyicon" >> $GITHUB_ENV
+          echo "pluginSlug=easyiconfonts" >> $GITHUB_ENV
           echo "pluginName=EasyIcon" >> $GITHUB_ENV
-          echo "mainPluginFile=easyicon.php" >> $GITHUB_ENV
-          echo "pluginFolder=easyicon" >> $GITHUB_ENV
+          echo "mainPluginFile=easyiconfonts.php" >> $GITHUB_ENV
+          echo "pluginFolder=easyiconfonts" >> $GITHUB_ENV
 
       # Setup PHP environment
       - name: Setup PHP

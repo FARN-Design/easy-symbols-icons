@@ -1,9 +1,9 @@
 {
-    "name": "farn/easyicon",
+    "name": "farn/easyiconfonts",
     "type": "wordpress-plugin",
     "autoload": {
         "psr-4": {
-            "Farn\\EasyIcon\\": "src/"
+            "Farn\\EasyIconFonts\\": "src/"
         }
     },
     "authors": [
@@ -22,6 +22,11 @@
               "url": "https://github.com/NLion74/php-font-lib",
               "type": "git",
               "reference": "master"
+            },
+            "autoload": {
+              "psr-4": {
+                "FontLib\\": "src/FontLib"
+              }
             }
           }
         }

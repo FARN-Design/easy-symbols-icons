@@ -1,9 +1,9 @@
 <?php
 
-namespace Farn\EasyIcon\restEndpoints;
+namespace Farn\EasyIconFonts\restEndpoints;
 
 use WP_REST_Response;
-use Farn\EasyIcon\iconHandler\IconHandler;
+use Farn\EasyIconFonts\iconHandler\IconHandler;
 
 /**
  * Class Rest
@@ -16,13 +16,13 @@ class RestHandler {
      * Register all REST API routes.
      */
     public static function register_routes() {
-        register_rest_route('easyicon/v1', '/loaded-fonts', [
+        register_rest_route('easyiconfonts/v1', '/loaded-fonts', [
             'methods'  => 'GET',
             'callback' => [self::class, 'get_loaded_fonts'],
             'permission_callback' => '__return_true',
         ]);
 
-        register_rest_route('easyicon/v1', '/download-default-fonts', [
+        register_rest_route('easyiconfonts/v1', '/download-default-fonts', [
             'methods'  => 'POST',
             'callback' => [self::class, 'download_default_fonts'],
             'permission_callback' => function () {

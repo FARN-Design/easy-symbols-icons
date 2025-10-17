@@ -1,8 +1,8 @@
 <?php
 
 /*
-Plugin Name: Easy Icon
-Plugin URI: https://github.com/FARN-Design/easyicon
+Plugin Name: Easy Icon Fonts
+Plugin URI: https://github.com/FARN-Design/easyiconfonts
 Description: A plugin to load and use various icon fonts with ease.
 Version: 1.0.0
 Author: Farnlabs
@@ -12,13 +12,27 @@ Text Domain: easyvcard
 Domain Path: src/resources/language
 */
 
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-use Farn\EasyIcon\database\Settings;
-use Farn\EasyIcon\menuPages\SettingsPage;
-use Farn\EasyIcon\blocks\Blocks;
-use Farn\EasyIcon\iconHandler\IconHandler;
-use Farn\EasyIcon\restEndpoints\RestHandler;
+// Fallback autoloader for FontLib when Composer's autoload doesn't register it (e.g., custom package install without autoload metadata)
+if (!class_exists(\FontLib\Font::class)) {
+    spl_autoload_register(function ($class) {
+        if (strpos($class, 'FontLib\\') === 0) {
+            $baseDir = __DIR__ . '/vendor/phenx/php-font-lib/src/';
+            $relativePath = str_replace('\\', '/', $class) . '.php';
+            $file = $baseDir . $relativePath;
+            if (is_file($file)) {
+                require $file;
+            }
+        }
+    });
+}
+
+use Farn\EasyIconFonts\database\Settings;
+use Farn\EasyIconFonts\menuPages\SettingsPage;
+use Farn\EasyIconFonts\blocks\Blocks;
+use Farn\EasyIconFonts\iconHandler\IconHandler;
+use Farn\EasyIconFonts\restEndpoints\RestHandler;
 
 if (! defined( 'ABSPATH' ) ) {
     die;
@@ -28,7 +42,7 @@ $plugin = new EasyIcon();
 
 class EasyIcon
 {
-    public static string $prefix = "ei_";
+    public static string $prefix = "eif_";
     public static string $software = "EasyIcon";
     public static string $pluginSlug = "easyIcon";
 

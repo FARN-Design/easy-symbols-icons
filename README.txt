@@ -1,7 +1,7 @@
-=== Easy Icon ===
+=== Easy Icon Fonts===
 Contributors: farndesign
 Tags: icons, icon fonts, font management, block editor, easy icon
-Requires at least: 6.0
+Requires at least: 6.2
 Tested up to: 6.8
 Stable tag: 1.0.0
 Requires PHP: 8.2
@@ -12,7 +12,7 @@ A simple WordPress plugin to manage and use icon fonts via a block editor with e
 
 == Description ==
 
-Easy Icon allows you to easily manage icon fonts on your WordPress site. Select from preloaded icon fonts or upload your own custom TTF and OTF fonts. Use the included `ei-icon` block to add icons to your posts and pages with ease.
+Easy Icon Fonts allows you to easily manage icon fonts on your WordPress site. Select from preloaded icon fonts or upload your own custom TTF and OTF fonts. Use the included `eif-icon` block to add icons to your posts and pages with ease.
 
 Features include:
 * Upload and management of custom icon fonts
@@ -24,16 +24,16 @@ Features include:
 
 = How to install the plugin? =
 
-1. Upload the Easy Icon plugin folder to the `/wp-content/plugins/` directory.
+1. Upload the Easy Icon Fonts plugin folder to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the ‘Plugins’ menu in WordPress.
-3. Navigate to the Easy Icon settings page to configure your fonts.
+3. Navigate to the Easy Icon Fonts settings page to configure your fonts.
 
 = How to use the plugin? =
 
-1. Go to the Easy Icon settings page in the WordPress admin view.
+1. Go to the Easy Icon Fonts settings page in the WordPress admin view.
 2. Under the "Font Select" tab, upload your custom fonts or select from the default fonts.
 3. Save your settings.
-4. In the WordPress block editor, add the `ei-icon` block to your content.
+4. In the WordPress block editor, add the `eif-icon` block to your content.
 5. Click the block to open the icon selector and choose your desired icon.
 
 == Screenshots ==
@@ -46,4 +46,4 @@ Features include:
 == Upgrade Notice ==
 
 = 1.0.0 =
-* Initial release. Download and install to start managing icon fonts with Easy Icon.
+* Initial release. Download and install to start managing icon fonts with Easy Icon Fonts.
