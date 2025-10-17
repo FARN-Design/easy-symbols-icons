@@ -8,7 +8,7 @@ Version: 1.0.0
 Author: Farnlabs
 Author URI: https://profiles.wordpress.org/farndesign/
 License: GPLv3
-Text Domain: easyiconfont
+Text Domain: easy-icon-fonts
 Domain Path: /src/resources/language
 */
 
