@@ -8,8 +8,8 @@ Version: 1.0.0
 Author: Farnlabs
 Author URI: https://profiles.wordpress.org/farndesign/
 License: GPLv3
-Text Domain: easyvcard
-Domain Path: src/resources/language
+Text Domain: easyiconfont
+Domain Path: /src/resources/language
 */
 
 require __DIR__ . '/vendor/autoload.php';

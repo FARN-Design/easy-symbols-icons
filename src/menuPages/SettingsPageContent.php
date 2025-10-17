@@ -167,7 +167,7 @@ function handleFontRemoval() {
                     ? esc_html__("Font removed successfully.", "easyiconfonts")
                     : esc_html__("Failed to remove the font.", "easyiconfonts");
 
-                echo '<div class="updated notice"><p>' . esc_html__($message) . '</p></div>';
+                echo '<div class="updated notice"><p>' . esc_html__($message, "easyiconfonts") . '</p></div>';
             }
         }
     }
@@ -193,7 +193,7 @@ function handleCustomFontUpload() {
                     ? esc_html__("Font uploaded and added successfully.", "easyiconfonts")
                     : esc_html__("Failed to add the font.", "easyiconfonts");
 
-                echo '<div class="updated notice"><p>' . esc_html__($message) . '</p></div>';
+                echo '<div class="updated notice"><p>' . esc_html__($message, "easyiconfonts") . '</p></div>';
             }
         }
     }
