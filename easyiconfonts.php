@@ -1,8 +1,8 @@
 <?php
 
 /*
-Plugin Name: Easy Icon
-Plugin URI: https://github.com/FARN-Design/easyicon
+Plugin Name: Easy Icon Fonts
+Plugin URI: https://github.com/FARN-Design/easyiconfonts
 Description: A plugin to load and use various icon fonts with ease.
 Version: 1.0.0
 Author: Farnlabs
@@ -28,11 +28,11 @@ if (!class_exists(\FontLib\Font::class)) {
     });
 }
 
-use Farn\EasyIcon\database\Settings;
-use Farn\EasyIcon\menuPages\SettingsPage;
-use Farn\EasyIcon\blocks\Blocks;
-use Farn\EasyIcon\iconHandler\IconHandler;
-use Farn\EasyIcon\restEndpoints\RestHandler;
+use Farn\EasyIconFonts\database\Settings;
+use Farn\EasyIconFonts\menuPages\SettingsPage;
+use Farn\EasyIconFonts\blocks\Blocks;
+use Farn\EasyIconFonts\iconHandler\IconHandler;
+use Farn\EasyIconFonts\restEndpoints\RestHandler;
 
 if (! defined( 'ABSPATH' ) ) {
     die;
@@ -42,7 +42,7 @@ $plugin = new EasyIcon();
 
 class EasyIcon
 {
-    public static string $prefix = "ei_";
+    public static string $prefix = "eif_";
     public static string $software = "EasyIcon";
     public static string $pluginSlug = "easyIcon";
 

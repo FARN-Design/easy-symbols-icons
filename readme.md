@@ -1,4 +1,4 @@
-# Easy Icon WordPress Plugin
+# Easy Icon Fonts WordPress Plugin
 
 ## Requirements
 
@@ -8,10 +8,10 @@
 ## Usage
 
 1. **Settings Page**
-   Go to the Easy Icon settings menu page in your WordPress admin view.
+   Go to the Easy Icon Fonts settings menu page in your WordPress admin view.
 
 2. **General Tab**
-   - Manage general settings for Easy Icon (in progress).
+   - Manage general settings for Easy Icon Fonts (in progress).
    - General info and tips.
 
 3. **Font Select Tab**
@@ -21,7 +21,7 @@
    - Save your changes.
 
 4. **Using the Icon Block**
-   Add the `ei-icon` block in the editor, click on the block, then select an icon from the appearing menu.
+   Add the `eif-icon` block in the editor, click on the block, then select an icon from the appearing menu.
 
 ### Notes
 

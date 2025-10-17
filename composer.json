@@ -1,9 +1,9 @@
 {
-    "name": "farn/easyicon",
+    "name": "farn/easyiconfonts",
     "type": "wordpress-plugin",
     "autoload": {
         "psr-4": {
-            "Farn\\EasyIcon\\": "src/"
+            "Farn\\EasyIconFonts\\": "src/"
         }
     },
     "authors": [

@@ -8,7 +8,7 @@
     },
     {
       "step": "activatePlugin",
-      "pluginPath": "/wordpress/wp-content/plugins/easyicon/easyicon.php"
+      "pluginPath": "/wordpress/wp-content/plugins/easyiconfonts/easyiconfonts.php"
     },
     {
       "step": "wp-cli",
