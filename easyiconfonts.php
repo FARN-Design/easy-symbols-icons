@@ -12,6 +12,10 @@ Text Domain: easy-icon-fonts
 Domain Path: /src/resources/language
 */
 
+if (! defined( 'ABSPATH' ) ) {
+	die;
+}
+
 require __DIR__ . '/vendor/autoload.php';
 
 // Fallback autoloader for FontLib when Composer's autoload doesn't register it (e.g., custom package install without autoload metadata)
@@ -33,10 +37,6 @@ use Farn\EasyIconFonts\menuPages\SettingsPage;
 use Farn\EasyIconFonts\blocks\Blocks;
 use Farn\EasyIconFonts\iconHandler\IconHandler;
 use Farn\EasyIconFonts\restEndpoints\RestHandler;
-
-if (! defined( 'ABSPATH' ) ) {
-    die;
-}
 
 $plugin = new EasyIcon();
 
