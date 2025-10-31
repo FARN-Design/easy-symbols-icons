@@ -5,6 +5,7 @@ namespace Farn\EasyIconFonts\iconHandler;
 use EasyIcon;
 use Farn\EasyIconFonts\database\Settings;
 use FontLib\Font;
+use Farn\EasyIconFonts\iconFontSubsetter\IconFontSubsetter;
 
 class IconHandler {
     private static IconHandler $instance;
@@ -26,7 +27,6 @@ class IconHandler {
         self::$pluginAssetsDir = EasyIcon::$pluginDirPath . 'assets/eif-icons/';
 
         self::generateUnifiedFontCSS();
-        self::enqueueUnifiedFontCSS();
     }
 
     /**
@@ -227,12 +227,8 @@ class IconHandler {
                 continue;
             }
 
-            $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
-            if (empty($font_files)) {
-                continue;
-            }
+            $font_file = self::getFontFilePath($fontFolder);
 
-            $font_file = $font_files[0];
             try {
                 $font = Font::load($font_file);
                 $font->parse();
@@ -293,6 +289,60 @@ class IconHandler {
         return !empty($filesAndDirs);
     }
 
+    /**
+     * Retrieves a list of all used icon class names in the content across posts.
+     *
+     * @return array An array of unique icon class names found in the content (e.g., eif-materialicons-home).
+     */
+    public static function get_used_icons(): array {
+        global $wpdb;
+
+        $like_pattern = '%eif-%';
+
+        $results = $wpdb->get_results("
+            SELECT ID, post_name, post_content
+            FROM {$wpdb->posts}
+            WHERE post_status = 'publish'
+            AND post_type NOT IN ('revision', 'nav_menu_item')
+            AND post_content LIKE '{$like_pattern}'
+        ");
+
+        $used_icons = [];
+
+        if (!empty($results)) {
+            foreach ($results as $post) {
+                $content = $post->post_content;
+
+                if (preg_match_all('/\[eif-icon\s+icon=["\'](eif-[a-zA-Z0-9_-]+|[a-zA-Z0-9_-]+)["\']\]/i', $content, $shortcode_matches)) {
+                    foreach ($shortcode_matches[1] as $icon_class) {
+                        if (strpos($icon_class, 'eif-') !== 0) {
+                            $icon_class = 'eif-' . $icon_class;
+                        }
+                        $used_icons[] = $icon_class;
+                    }
+                }
+
+                if (preg_match_all('/class=["\'][^"\']*?(eif-[a-zA-Z0-9_-]+)[^"\']*?["\']/i', $content, $class_matches)) {
+                    foreach ($class_matches[1] as $icon_class) {
+                        if (
+                            preg_match('/eif-icon-fonts$/i', $icon_class) ||
+                            preg_match('/^wp-block-easyiconfonts/i', $icon_class)
+                        ) {
+                            continue;
+                        }
+
+                        $used_icons[] = $icon_class;
+                    }
+                }
+            }
+        }
+
+        $used_icons = array_unique($used_icons);
+        sort($used_icons);
+
+        return $used_icons;
+    }
+
     // Private Helper Functions
 
     /**
@@ -307,6 +357,30 @@ class IconHandler {
         return in_array(pathinfo($fontName, PATHINFO_EXTENSION), $allowedExtensions, true);
     }
 
+    /**
+     * Retrieves the font file path for a given font folder.
+     *
+     * @param string $fontFolder The name of the font folder.
+     * 
+     * @return string|null The path to the font file, or null if not found.
+     */
+    private static function getFontFilePath(string $fontFolder): ?string {
+        $fontDir = self::$iconsDir . '/' . $fontFolder;
+
+        $fontFileTtf = $fontDir . '/' . $fontFolder . '.ttf';
+        $fontFileOtf = $fontDir . '/' . $fontFolder . '.otf';
+
+        if (file_exists($fontFileTtf)) {
+            $font_file = $fontFileTtf;
+        } elseif (file_exists($fontFileOtf)) {
+            $font_file = $fontFileOtf;
+        } else {
+            $font_file = null;
+        }
+        
+        return $font_file;
+    }
+        
     /**
      * Creates the icon directory if it doesn't exist.
      *
@@ -353,6 +427,14 @@ class IconHandler {
         }
 
         return $allSuccess;
+    }
+
+    private static function flattenArray(array $array): array {
+        $result = [];
+        array_walk_recursive($array, function($item) use (&$result) {
+            $result[] = $item;
+        });
+        return $result;
     }
 
     /**
@@ -487,90 +569,162 @@ class IconHandler {
         $previous_loaded_fonts_json = get_option('eif_prev_loaded_fonts', '[]');
         $previous_loaded_fonts = json_decode($previous_loaded_fonts_json, true);
 
-        if ($enabled_fonts === $previous_loaded_fonts) {
+        $used_icons = self::get_used_icons();
+        $previous_used_icons_json = get_option('ei_prev_used_icons', '[]');
+        $previous_used_icons = json_decode($previous_used_icons_json, true);
+
+        if ($enabled_fonts === $previous_loaded_fonts && $used_icons === $previous_used_icons) {
             return;
         }
 
-        $css_output = '';
-
         $font_mappings = self::getLoadedFontGlyphsMapping();
-        foreach ($font_mappings as $fontFolder => $glyph_mappings) {
-            if (empty($fontFolder)) {
+
+        $frontend_css = '';
+        $backend_css = '';
+
+
+        foreach ($enabled_fonts as $fontFolder) {
+            if (empty($fontFolder) || !isset($font_mappings[$fontFolder])) {
                 error_log("Skipping empty or invalid font folder" . $fontFolder);
                 continue;
             }
 
             $font_dir = self::$iconsDir . '/' . $fontFolder;
-            $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+            $font_file = self::getFontFilePath($fontFolder);
 
-            if (empty($font_files)) {
-                error_log("No font files found in {$font_dir}");
+            if (empty($font_file )) {
+                error_log("No valid font file found in {$font_dir}");
                 continue;
             }
 
-            $font_file = $font_files[0];
+            $original_font_path = $font_file;
             
             try {
-                $font_name = Font::load($font_file)->getFontName();
-
-                $css_output .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($font_file) ."') format('truetype');}";
-                $css_output .= '[class^="eif-' . strtolower($fontFolder) . '-"]{font-family:"' . $font_name . '";}';
-                foreach ($font_mappings[$fontFolder] as $glyph_name => $unicode_hex) {
-                    $class = '.eif-' . strtolower($fontFolder) . '-' . strtolower($glyph_name);
-                    $css_output .= "{$class}::before{content:\"{$unicode_hex}\";}";
-                }
+                $font = Font::load($original_font_path);
+                $font->parse();
+                $font_name = $font->getFontName();
             } catch (\Exception $e) {
                 error_log("Font parse error for '{$fontFolder}': " . $e->getMessage());
+                continue;
             }
-        }
-        if ($css_output) {
-            $css_file = self::$iconsDir . '/generated-icons.css';
-            if (file_put_contents($css_file, $css_output)) {
-            } else {
-                error_log("Error writing CSS to file: {$css_file}");
-            }
-        }
 
-        update_option('eif_prev_loaded_fonts', json_encode($enabled_fonts));
+            // temporary iterative assignment of backend css in case of subsetting failure to use as backup
+            $backend_css_temp = '';
+            $backend_css_temp .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($original_font_path) ."') format('truetype');}";
+            $backend_css_temp .= '[class^="eif-' . strtolower($fontFolder) . '__"]{font-family:"' . $font_name . '";}';
+
+            foreach ($font_mappings[$fontFolder] as $glyph_name => $unicode_hex) {
+                $class = '.eif-' . strtolower($fontFolder) . '__' . strtolower($glyph_name);
+                $backend_css_temp .= "{$class}::before{content:\"{$unicode_hex}\";}";
+            }
+
+            $backend_css .= $backend_css_temp;
+
+            if (!empty($used_icons)) {
+                $frontend_font_path = "{$font_dir}/{$fontFolder}-frontend.ttf";
+
+                foreach ($used_icons as $icon_class) {
+                    if (preg_match('/^eif-([^\s]+?)__([^\s]+)$/i', $icon_class, $matches)) {
+                        $matchedFontFolder = strtolower(trim($matches[1]));
+                        $fontFolderNormalized = strtolower(trim($fontFolder));
+
+                        if ($matchedFontFolder === $fontFolderNormalized) {
+                            if (!isset($icon_map[$fontFolder])) {
+                                $icon_map[$fontFolder] = [];
+                            }
+                            $icon_map[$fontFolder][] = $matches[2];
+                        }
+                    }
+                }
+                
+                if (!empty($icon_map[$fontFolder])) {
+                    $unicodeGlyphs = [];
+
+                    foreach ($icon_map[$fontFolder] as $glyphName) {
+                        if (isset($font_mappings[$fontFolder][$glyphName])) {
+                            $unicodeGlyphs[] = $font_mappings[$fontFolder][$glyphName];
+                        }
+                    }
+
+                    try {
+                        $subsetter = new IconFontSubsetter($original_font_path);
+                        if (!$subsetter->subset($unicodeGlyphs, $frontend_font_path)) {
+                            error_log("Font subsetting failed for {$fontFolder}");
+                            $frontend_css .= $backend_css_temp;
+                            continue;
+                        }
+                    } catch (\Exception $e) {
+                        error_log("Subset error for {$fontFolder}: " . $e->getMessage());
+                        $frontend_css .= $backend_css_temp;
+                        continue;
+                    }
+
+                    // Generate frontend CSS
+                    $frontend_css .= "@font-face{font-family:'{$font_name}';src:url('" . self::$iconsUrl . "/{$fontFolder}/" . basename($frontend_font_path) . "') format('truetype');}";
+                    $frontend_css .= '[class^="eif-' . strtolower($fontFolder) . '__"]{font-family:"' . $font_name . '";}';
+
+                    foreach ($icon_map[$fontFolder] as $glyph_name) {
+                        if (isset($font_mappings[$fontFolder][$glyph_name])) {
+                            $unicode_hex = $font_mappings[$fontFolder][$glyph_name];
+                            $class = '.eif-' . strtolower($fontFolder) . '__' . strtolower($glyph_name);
+                            $frontend_css .= "{$class}::before{content:\"{$unicode_hex}\";}";
+                        }
+                    }
+                }
+            }
+        }
+        file_put_contents(self::$iconsDir . '/frontend.css', $frontend_css);
+        file_put_contents(self::$iconsDir . '/backend.css', $backend_css);
+
+        self::enqueueUnifiedFontCSS();
+
+        update_option('ei_prev_loaded_fonts', json_encode($enabled_fonts));
     }
 
-    /**
-     * Enqueues the unified CSS file for the loaded fonts.
+    /*
+     * Enqueues the frontend and backend icon CSS files.
+     *
+     * - frontend.css: Loaded on the frontend of the site.
+     * - backend.css: Loaded in the WordPress block/classic editor as editor styles.
      *
      * @return void
      */
     private static function enqueueUnifiedFontCSS(): void {
-        $upload_dir = wp_upload_dir();
-        $css_file_url = self::$iconsUrl . '/generated-icons.css';
-        $css_file_dir = self::$iconsDir . '/generated-icons.css';
+        $frontend_css_url = self::$iconsUrl . '/frontend.css';
+        $frontend_css_path = self::$iconsDir . '/frontend.css';
 
-        if (file_exists($css_file_dir)) {
-            add_action('wp_enqueue_scripts', function() use ($css_file_url, $css_file_dir) {
+        $backend_css_url = self::$iconsUrl . '/backend.css';
+        $backend_css_path = self::$iconsDir . '/backend.css';
+
+        if (file_exists($frontend_css_path)) {
+            add_action('wp_enqueue_scripts', function () use ($frontend_css_url, $frontend_css_path) {
                 wp_enqueue_style(
-                    'easyiconfonts-unified-css',
-                    $css_file_url,
+                    'easyicon-frontend-css',
+                    $frontend_css_url,
                     [],
-                    filemtime($css_file_dir)
-                );
-            });
-
-            add_action('admin_init', function() use ($css_file_url) {
-                add_editor_style(
-                    $css_file_url
-                );
-            });
-
-            add_action('admin_enqueue_scripts' , function() use ($css_file_url, $css_file_dir) {
-                wp_enqueue_style(
-                    'easyiconfonts-unified-css',
-                    $css_file_url,
-                    [],
-                    filemtime($css_file_dir)
+                    filemtime($frontend_css_path)
                 );
             });
         } else {
-            error_log("No unified CSS file found to enqueue.");
+            error_log("No frontend CSS file found to enqueue.");
+        }
+
+        if (file_exists($backend_css_path)) {
+            add_action('admin_init', function() use ($backend_css_url) {
+                add_editor_style($backend_css_url);
+            });
+
+            add_action('admin_enqueue_scripts', function() {
+                $backend_css_url = self::$iconsUrl . '/backend.css';
+                wp_enqueue_style(
+                    'easyiconfonts-unified-css',
+                    $backend_css_url,
+                    [],
+                    filemtime(self::$iconsDir . '/backend.css')
+                );
+            });
+        } else {
+            error_log("No unified CSS file found for backend to enqueue.");
         }
     }
-
 }
