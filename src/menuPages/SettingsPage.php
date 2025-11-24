@@ -10,8 +10,8 @@ class SettingsPage {
 
 		add_action( 'admin_menu', function(){
 			add_menu_page(
-				__( 'Easy Icon Fonts Settings', 'easysymbolsicons' ),
-				__( 'Easy Icon Fonts Settings', 'easysymbolsicons' ),
+				__( 'Easy Symbols & Icons Settings', 'easysymbolsicons' ),
+				__( 'Easy Symbols & Icons Settings', 'easysymbolsicons' ),
 				'manage_options',
 				\EasyIcon::$prefix.'settings-page',
 				function (){ include("SettingsPageContent.php"); },

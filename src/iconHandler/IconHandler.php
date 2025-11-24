@@ -53,7 +53,6 @@ class IconHandler {
     public static function initializeIcons(): void {
         if (!self::doesIconsDirectoryExist()) {
             self::createIconFolder();
-            self::addDefaultFonts();
         }
 
         self::generateUnifiedFontCSS();
@@ -320,43 +319,6 @@ class IconHandler {
     }
 
     /**
-     * Downloads default fonts from remote URLs and saves them to the icons directory.
-     * This only happens if the user manually clicks the download default fonts from external sources button.
-     *
-     * @return bool
-     */
-    private static function addDefaultFonts(): bool {
-        $fontUrls = [
-            'fa-solid-900.ttf' => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-solid-900.ttf',
-            'MaterialIcons-Regular.ttf' => 'https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/4.0.0/font/MaterialIcons-Regular.ttf',
-            'fa-solid-900-line-awesome.ttf' => 'https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/font-awesome-line-awesome/webfonts/fa-solid-900.ttf',
-            'dashicons.ttf' => 'https://github.com/WordPress/dashicons/raw/628951563b9c0f0d293af8e40c9b0b3da5e2880d/icon-font/fonts/dashicons.ttf',
-        ];
-
-        $allSuccess = true;
-
-        foreach ($fontUrls as $filename => $url) {
-            try {
-                $fontBlob = file_get_contents($url);
-                if ($fontBlob === false) {
-                    error_log("EasyIcon: Failed to download font from URL: $url");
-                    $allSuccess = false;
-                    continue;
-                }
-
-                if (!self::addFont($fontBlob, $filename)) {
-                    $allSuccess = false;
-                }
-            } catch (\Throwable $e) {
-                error_log("EasyIcon Exception when downloading $filename: " . $e->getMessage());
-                $allSuccess = false;
-            }
-        }
-
-        return $allSuccess;
-    }
-
-    /**
      * Recursively retrieves all files and directories in a given directory.
      *
      * @param string $dir The directory to scan.
@@ -561,7 +523,7 @@ class IconHandler {
                 );
             });
         } else {
-            error_log("No unified CSS file found to enqueue.");
+//            error_log("No unified CSS file found to enqueue.");
         }
     }
 

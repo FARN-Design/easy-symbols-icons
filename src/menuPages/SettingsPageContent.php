@@ -154,7 +154,7 @@ function displayFontSelectionForm() {
     $selected_fonts = json_decode(Settings::getSettingFromDB('loaded_fonts'), true) ?? [];
     $available_fonts = IconHandler::getAvailableFonts();
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['easysymbolsicons_fonts_nonce']) && wp_verify_nonce($_POST['easysymbolsicons_fonts_nonce'], 'save_easysymbolsicons_fonts')) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['easysymbolsicons_fonts_nonce']) && wp_verify_nonce(wp_unslash(sanitize_text_field($_POST['easysymbolsicons_fonts_nonce'])), 'save_easysymbolsicons_fonts')) {
         $selected_fonts = handleFontSelectionSave($selected_fonts);
     }
 
@@ -232,7 +232,7 @@ function handleFontRemoval() {
         $font_to_remove = wp_unslash($_POST['font_to_remove']);
         $remove_font_nonce = wp_unslash($_POST['remove_font_nonce']);
         
-        if (wp_verify_nonce($remove_font_nonce, 'remove_easysymbolsicons_font')) {
+        if (wp_verify_nonce(wp_unslash(sanitize_text_field($remove_font_nonce)), 'remove_easysymbolsicons_font')) {
             $font_to_remove = sanitize_text_field($font_to_remove);
             if (!empty($font_to_remove)) {
                 $remove_result = IconHandler::removeFont($font_to_remove);
@@ -252,7 +252,7 @@ function handleCustomFontUpload() {
         $uploaded_file = $_FILES['custom_font'];
         $upload_custom_font_nonce = wp_unslash($_POST['upload_custom_font_nonce']);
         
-        if (wp_verify_nonce($upload_custom_font_nonce, 'upload_custom_font')) {
+        if (wp_verify_nonce(wp_unslash(sanitize_text_field($upload_custom_font_nonce)), 'upload_custom_font')) {
             $file_extension = pathinfo($uploaded_file['name'], PATHINFO_EXTENSION);
             $valid_extensions = ['ttf', 'otf'];
             
