@@ -6,6 +6,7 @@ wp-tests-lib
 .vscode/*
 **/build/**
 src/blocks/esi-icon/build/
+src/blocks/ei-icon/node_modules/
 
 .idea/*
 .DS_Store
