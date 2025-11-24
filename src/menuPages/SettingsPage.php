@@ -1,6 +1,6 @@
 <?php
 
-namespace Farn\EasyIconFonts\menuPages;
+namespace Farn\EasySymbolsIcons\menuPages;
 
 class SettingsPage {
 	
@@ -21,7 +21,7 @@ class SettingsPage {
 		});
 
 		add_action('admin_enqueue_scripts', function ($hook_suffix) {
-			if (strpos($hook_suffix, 'eif_settings-page') === false) {
+			if (strpos($hook_suffix, 'esi_settings-page') === false) {
 				return;
 			}
 

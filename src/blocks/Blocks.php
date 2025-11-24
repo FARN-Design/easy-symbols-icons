@@ -1,9 +1,7 @@
 <?php
 
-namespace Farn\EasyIconFonts\blocks;
-use EasyIcon\database\Settings;
-use EasyIcon\farnTools\farnLog;
-use Farn\EasyIconFonts\iconHandler\IconHandler;
+namespace Farn\EasySymbolsIcons\blocks;
+use Farn\EasySymbolsIcons\iconHandler\IconHandler;
 use WP_Post;
 use WP_REST_Response;
 
@@ -25,7 +23,7 @@ class Blocks {
      */
 	public static function setup() {
 		add_action( 'init', function () {
-			$block_registered = register_block_type(__DIR__ . '/eif-icon/build/eif-icon');
+			$block_registered = register_block_type( __DIR__ . '/esi-icon/build/eif-icon' );
 		} );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Farn\EasyIconFonts\database;
+namespace Farn\EasySymbolsIcons\database;
 
 use EasyIcon;
 use wpdb;

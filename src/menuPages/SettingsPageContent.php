@@ -1,8 +1,8 @@
 <?php
-namespace Farn\EasyIconFonts\menuPages;
+namespace Farn\EasySymbolsIcons\menuPages;
 
-use Farn\EasyIconFonts\database\Settings;
-use Farn\EasyIconFonts\iconHandler\IconHandler;
+use Farn\EasySymbolsIcons\database\Settings;
+use Farn\EasySymbolsIcons\iconHandler\IconHandler;
 
 $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'default';
 ?>
@@ -28,10 +28,10 @@ $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'default';
 function displayTabNavigation($currentTab) {
     ?>
     <nav class="nav-tab-wrapper">
-        <a href="?page=eif_settings-page&tab=default" class="nav-tab <?php echo $currentTab === "default" ? "nav-tab-active" : ""; ?>">
+        <a href="?page=esi_settings-page&tab=default" class="nav-tab <?php echo $currentTab === "default" ? "nav-tab-active" : ""; ?>">
             <?php echo esc_html__("General", "easyiconfonts"); ?>
         </a>
-        <a href="?page=eif_settings-page&tab=fontselect" class="nav-tab <?php echo $currentTab === "fontselect" ? "nav-tab-active" : ""; ?>">
+        <a href="?page=esi_settings-page&tab=fontselect" class="nav-tab <?php echo $currentTab === "fontselect" ? "nav-tab-active" : ""; ?>">
             <?php echo esc_html__("Font Select", "easyiconfonts"); ?>
         </a>
     </nav>
@@ -162,12 +162,12 @@ function handleFontRemoval() {
             $font_to_remove = sanitize_text_field($font_to_remove);
             if (!empty($font_to_remove)) {
                 $remove_result = IconHandler::removeFont($font_to_remove);
-                
-                $message = $remove_result 
+
+                echo '<div class="updated notice"><p>';
+                echo $remove_result
                     ? esc_html__("Font removed successfully.", "easyiconfonts")
                     : esc_html__("Failed to remove the font.", "easyiconfonts");
-
-                echo '<div class="updated notice"><p>' . esc_html__($message) . '</p></div>';
+                echo '</p></div>';
             }
         }
     }
@@ -189,11 +189,11 @@ function handleCustomFontUpload() {
                 $font_name = sanitize_file_name($uploaded_file['name']);
                 $font_added = IconHandler::addFont($file_blob, $font_name);
 
-                $message = $font_added 
+                echo '<div class="updated notice"><p>';
+                echo $font_added
                     ? esc_html__("Font uploaded and added successfully.", "easyiconfonts")
                     : esc_html__("Failed to add the font.", "easyiconfonts");
-
-                echo '<div class="updated notice"><p>' . esc_html__($message) . '</p></div>';
+                echo '</p></div>';
             }
         }
     }

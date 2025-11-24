@@ -1,9 +1,9 @@
 <?php
 
-namespace Farn\EasyIconFonts\iconHandler;
+namespace Farn\EasySymbolsIcons\iconHandler;
 
 use EasyIcon;
-use Farn\EasyIconFonts\database\Settings;
+use Farn\EasySymbolsIcons\database\Settings;
 use FontLib\Font;
 
 class IconHandler {
@@ -484,7 +484,7 @@ class IconHandler {
             return;
         }
 
-        $previous_loaded_fonts_json = get_option('eif_prev_loaded_fonts', '[]');
+        $previous_loaded_fonts_json = get_option('esi_prev_loaded_fonts', '[]');
         $previous_loaded_fonts = json_decode($previous_loaded_fonts_json, true);
 
         if ($enabled_fonts === $previous_loaded_fonts) {
@@ -531,7 +531,7 @@ class IconHandler {
             }
         }
 
-        update_option('eif_prev_loaded_fonts', json_encode($enabled_fonts));
+        update_option('esi_prev_loaded_fonts', json_encode($enabled_fonts));
     }
 
     /**

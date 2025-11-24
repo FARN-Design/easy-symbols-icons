@@ -87,13 +87,13 @@ export default function Edit({ attributes, setAttributes }) {
     });
 
     const wrapperClass = `selected-icon-wrapper align${align}`;
-    const selectorID = `eif-icon-grid-${blockId}`;
+    const selectorID = `esi-icon-grid-${blockId}`;
 
     const isIconValid = (iconClassName, loadedFonts) => {
         for (const fontFolder in loadedFonts) {
             const fontGlyphs = loadedFonts[fontFolder];
             for (const glyphName in fontGlyphs) {
-                const expectedClass = `eif-${fontFolder.toLowerCase()}-${glyphName}`;
+                const expectedClass = `esi-${fontFolder.toLowerCase()}-${glyphName}`;
                 if (iconClassName === expectedClass) {
                     return true;
                 }
@@ -126,8 +126,8 @@ export default function Edit({ attributes, setAttributes }) {
             </div>
 
             {(
-                <div className="eif-icon-grid" id={selectorID} popover="true">
-                    <div className="eif-icon-search">
+                <div className="esi-icon-grid" id={selectorID} popover="true">
+                    <div className="esi-icon-search">
                         <TextControl
                             value={searchTerm}
                             onChange={(value) => setSearchTerm(value)}
@@ -135,21 +135,21 @@ export default function Edit({ attributes, setAttributes }) {
                         />
                     </div>
 
-                    <div className="eif-icon-font-selects">
+                    <div className="esi-icon-font-selects">
                     {loading && <p>{__('Loading fonts...', 'easyiconfonts')}</p>}
                     {error && <p>{__('Error: ', 'easyiconfonts')}{error}</p>}
                     {!loading && !error && filteredFonts.length > 0 && (
                         filteredFonts.map((font, index) => (
-                            <details key={index} className="eif-font-details">
+                            <details key={index} className="esi-font-details">
                                 <summary>{font.fontFolder}</summary>
-                                <div className="eif-font-icons">
+                                <div className="esi-font-icons">
                                     {font.glyphs.map(([name], i) => {
-                                        const iconClass = `eif-${font.fontFolder.toLowerCase()}-${name}`;
+                                        const iconClass = `esi-${font.fontFolder.toLowerCase()}-${name}`;
 
                                         return (
                                             <span
                                                 key={i}
-                                                className="eif-font-icon"
+                                                className="esi-font-icon"
                                                 onClick={() => handleIconClick(iconClass)} // Select icon on click
                                                 style={{ cursor: 'pointer', fontSize: '20px', margin: '5px' }}
                                             >

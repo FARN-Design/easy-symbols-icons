@@ -5,7 +5,7 @@ wp-tests-lib
 /.phpunit.result.cache
 .vscode/*
 **/build/**
-src/blocks/eif-icon/build/
+src/blocks/esi-icon/build/
 
 .idea/*
 .DS_Store

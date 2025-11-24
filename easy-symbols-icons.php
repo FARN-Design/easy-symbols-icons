@@ -1,16 +1,20 @@
 <?php
 
 /*
-Plugin Name: Easy Icon Fonts
+Plugin Name: Easy Symbols & Icons
 Plugin URI: https://github.com/FARN-Design/easyiconfonts
 Description: A plugin to load and use various icon fonts with ease.
 Version: 1.0.0
 Author: Farnlabs
 Author URI: https://profiles.wordpress.org/farndesign/
 License: GPLv3
-Text Domain: easyvcard
-Domain Path: src/resources/language
+Text Domain: easy-symbols-icons
+Domain Path: /src/resources/language
 */
+
+if (! defined( 'ABSPATH' ) ) {
+	die;
+}
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -28,23 +32,19 @@ if (!class_exists(\FontLib\Font::class)) {
     });
 }
 
-use Farn\EasyIconFonts\database\Settings;
-use Farn\EasyIconFonts\menuPages\SettingsPage;
-use Farn\EasyIconFonts\blocks\Blocks;
-use Farn\EasyIconFonts\iconHandler\IconHandler;
-use Farn\EasyIconFonts\restEndpoints\RestHandler;
-
-if (! defined( 'ABSPATH' ) ) {
-    die;
-}
+use Farn\EasySymbolsIcons\database\Settings;
+use Farn\EasySymbolsIcons\menuPages\SettingsPage;
+use Farn\EasySymbolsIcons\blocks\Blocks;
+use Farn\EasySymbolsIcons\iconHandler\IconHandler;
+use Farn\EasySymbolsIcons\restEndpoints\RestHandler;
 
 $plugin = new EasyIcon();
 
 class EasyIcon
 {
-    public static string $prefix = "eif_";
-    public static string $software = "EasyIcon";
-    public static string $pluginSlug = "easyIcon";
+    public static string $prefix = "esi_";
+    public static string $software = "EasySymbolsIcon";
+    public static string $pluginSlug = "easy-symbols-icons";
 
     /**
      * @var string Path to the main plugin directory

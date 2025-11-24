@@ -1,7 +1,7 @@
 {
-	"name": "eif-icon",
-	"version": "0.1.0",
-	"description": "Example block scaffolded with Create Block tool.",
+	"name": "esi-icon",
+	"version": "1.0.0",
+	"description": "A Block to load and use various icon fonts with ease.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",

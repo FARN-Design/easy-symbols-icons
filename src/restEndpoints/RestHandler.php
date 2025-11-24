@@ -1,9 +1,9 @@
 <?php
 
-namespace Farn\EasyIconFonts\restEndpoints;
+namespace Farn\EasySymbolsIcons\restEndpoints;
 
 use WP_REST_Response;
-use Farn\EasyIconFonts\iconHandler\IconHandler;
+use Farn\EasySymbolsIcons\iconHandler\IconHandler;
 
 /**
  * Class Rest
