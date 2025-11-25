@@ -477,7 +477,7 @@ class IconHandler {
                 $font_name = Font::load($font_file)->getFontName();
 
                 $css_output .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($font_file) ."') format('truetype');}";
-                $css_output .= '[class^="esi-' . strtolower($fontFolder) . '-"]{font-family:"' . $font_name . '";}';
+                $css_output .= '[class*="esi-' . strtolower($fontFolder) . '-"]::before{font-family:"' . $font_name . '";}';
                 foreach ($font_mappings[$fontFolder] as $glyph_name => $unicode_hex) {
                     $class = '.esi-' . strtolower($fontFolder) . '-' . strtolower($glyph_name);
                     $css_output .= "{$class}::before{content:\"{$unicode_hex}\";}";
