@@ -27,7 +27,6 @@ class IconHandler {
         self::$pluginAssetsDir = EasyIcon::$pluginDirPath . 'assets/esi-icons/';
 
         self::generateUnifiedFontCSS();
-        self::enqueueUnifiedFontCSS();
     }
 
     /**

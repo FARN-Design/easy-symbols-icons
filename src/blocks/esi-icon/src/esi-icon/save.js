@@ -20,7 +20,7 @@ export default function Save({ attributes }) {
 			{className ? (
 				<span className={className}></span>
 			) : (
-				<p>{__("No Icon Selected", "easysymbolsicons")}</p>
+				<p>{__("No Icon Selected", "easy-symbols-icons")}</p>
 			)}
 		</div>
 	);
