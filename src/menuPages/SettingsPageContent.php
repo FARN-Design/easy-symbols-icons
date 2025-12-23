@@ -184,6 +184,7 @@ function displayCustomFontUploadForm() {
     <input type="file" name="custom_font" id="custom_font_upload" accept=".ttf,.otf" required>
 
     <?php wp_nonce_field('upload_custom_font', 'upload_custom_font_nonce'); ?>
+    <?php wp_nonce_field('remove_easysymbolsicons_font', 'remove_font_nonce'); ?>
     
     <p><input type="submit" class="button button-primary" value="<?php echo esc_html__("Upload Font", "easy-symbols-icons"); ?>"></p>
     <?php

@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     removeButtons.forEach((button) => {
         button.addEventListener("click", function () {
             const fontToRemove = button.getAttribute("data-font");
+
             const form = document.createElement("form");
             form.method = "POST";
             form.action = window.location.href;
