@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "easy-symbols-icons/esi-icon-fonts",
+	"name": "easy-symbols-icons/eics-symbols-icons",
 	"version": "1.0.0",
 	"title": "Icon",
 	"category": "widgets",
@@ -20,8 +20,8 @@
 			"lineHeight": true
 		}
 	},
-	"keywords": ["icon", "loader", "font", "esi_icon"],
-	"textdomain": "esi_icon",
+	"keywords": ["icon", "loader", "font", "eics_icon"],
+	"textdomain": "eics_icon",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",

@@ -2,7 +2,7 @@
 
 namespace Farn\EasySymbolsIcons\database;
 
-use EasyIcon;
+use EasySymbolsIcons;
 use wpdb;
 
 class Settings
@@ -14,7 +14,7 @@ class Settings
 		global $wpdb;
 		self::$wpdb = $wpdb;
 
-		self::$tableName = $wpdb->prefix . EasyIcon::$prefix . str_replace(".php", "", basename(__FILE__));
+		self::$tableName = $wpdb->prefix . EasySymbolsIcons::$prefix . str_replace(".php", "", basename(__FILE__));
 
 		self::createDatabaseTable();
 		self::setupDefaults();

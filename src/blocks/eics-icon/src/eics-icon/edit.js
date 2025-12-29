@@ -98,13 +98,13 @@ export default function Edit({ attributes, setAttributes }) {
 	});
 
 	const wrapperClass = `selected-icon-wrapper align${align}`;
-	const selectorID = `esi-icon-grid-${blockId}`;
+	const selectorID = `eics-icon-grid-${blockId}`;
 
 	const isIconValid = (iconClassName, loadedFonts) => {
 		for (const fontFolder in loadedFonts) {
 			const fontGlyphs = loadedFonts[fontFolder];
 			for (const glyphName in fontGlyphs) {
-				const expectedClass = `esi-${fontFolder.toLowerCase()}__${glyphName}`;
+				const expectedClass = `eics-${fontFolder.toLowerCase()}__${glyphName}`;
 				if (iconClassName === expectedClass) {
 					return true;
 				}
@@ -126,20 +126,20 @@ export default function Edit({ attributes, setAttributes }) {
 				{selectedIcon.className &&
 				isIconValid(selectedIcon.className, fonts) ? (
 					<button
-						className={selectedIcon.className + " esi-select-button-has-icon"}
+						className={selectedIcon.className + " eics-select-button-has-icon"}
 						style={{ cursor: "pointer" }}
 						popovertarget={selectorID}
 					></button>
 				) : (
-					<button className="esi-select-button" popovertarget={selectorID}>
+					<button className="eics-select-button" popovertarget={selectorID}>
 						{__("add icon", "easy-symbols-icons")}
 					</button>
 				)}
 			</div>
 
 			{
-				<div className="esi-icon-grid" id={selectorID} popover="auto">
-					<div className="esi-icon-search">
+				<div className="eics-icon-grid" id={selectorID} popover="auto">
+					<div className="eics-icon-search">
 						<TextControl
 							value={searchTerm}
 							onChange={(value) => setSearchTerm(value)}
@@ -150,7 +150,7 @@ export default function Edit({ attributes, setAttributes }) {
 						/>
 					</div>
 
-					<div className="esi-icon-font-selects">
+					<div className="eics-icon-font-selects">
 						{loading && <p>{__("Loading fonts...", "easy-symbols-icons")}</p>}
 						{error && (
 							<p>
@@ -162,16 +162,16 @@ export default function Edit({ attributes, setAttributes }) {
 							!error &&
 							filteredFonts.length > 0 &&
 							filteredFonts.map((font, index) => (
-								<details key={index} className="esi-font-details" open>
+								<details key={index} className="eics-font-details" open>
 									<summary>{font.fontFolder}</summary>
-									<div className="esi-font-icons">
+									<div className="eics-font-icons">
 										{font.glyphs.map(([name], i) => {
-											const iconClass = `esi-${font.fontFolder.toLowerCase()}__${name}`;
+											const iconClass = `eics-${font.fontFolder.toLowerCase()}__${name}`;
 
 											return (
 												<span
 													key={i}
-													className="esi-font-icon"
+													className="eics-font-icon"
 													onClick={() => handleIconClick(iconClass)} // Select icon on click
 													style={{
 														cursor: "pointer",

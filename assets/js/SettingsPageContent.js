@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const nonceInput = document.createElement("input");
             nonceInput.type = "hidden";
             nonceInput.name = "remove_font_nonce";
-            nonceInput.value = EASYICON.remove_nonce;
+            nonceInput.value = EASYICONSYMBOLS.remove_nonce;
             form.appendChild(nonceInput);
 
             document.body.appendChild(form);
@@ -37,11 +37,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document
             .getElementById("download-default-fonts")
             .addEventListener("click", () => {
-                fetch(EASYICON.rest_url, {
+                fetch(EASYICONSYMBOLS.rest_url, {
                     method: "POST",
                     credentials: "same-origin",
                     headers: {
-                        "X-WP-Nonce": EASYICON.rest_nonce,
+                        "X-WP-Nonce": EASYICONSYMBOLS.rest_nonce,
                         "Content-Type": "application/json",
                     },
                 })
@@ -51,23 +51,23 @@ document.addEventListener("DOMContentLoaded", function () {
                         return response.json();
                     })
                     .then(() => {
-                        alert(EASYICON.success_message);
+                        alert(EASYICONSYMBOLS.success_message);
                         window.location.reload();
                     })
                     .catch((error) => {
-                        alert(EASYICON.error_message);
+                        alert(EASYICONSYMBOLS.error_message);
                         console.error(error);
                     });
             });
     }
 
-    const iconItems = document.querySelectorAll(".esi-icon-item");
+    const iconItems = document.querySelectorAll(".eics-icon-item");
 
     iconItems.forEach((icon) => {
         icon.addEventListener("click", () => {
             const iconName = icon.getAttribute("data-icon-name");
             const fontName = icon.getAttribute("data-font-name");
-            const shortcode = `[esi-icon icon="${fontName}__${iconName}"]`;
+            const shortcode = `[eics-icon icon="${fontName}__${iconName}"]`;
 
             copyToClipboard(shortcode)
                 .then(() => showTooltip(icon, "Copied!"))
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 1200);
     }
 
-    const searchInput = document.getElementById("esi-icon-search");
+    const searchInput = document.getElementById("eics-icon-search");
 
     searchInput.addEventListener("input", function () {
         const query = this.value.toLowerCase();
@@ -140,11 +140,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        const fontSections = document.querySelectorAll(".esi-font-section");
+        const fontSections = document.querySelectorAll(".eics-font-section");
 
         fontSections.forEach((section) => {
             const visibleIcons = section.querySelectorAll(
-                '.esi-icon-item:not([style*="display: none"])'
+                '.eics-icon-item:not([style*="display: none"])'
             );
             if (visibleIcons.length > 0) {
                 section.style.display = "block";
@@ -153,8 +153,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        const alphaNavs = document.querySelectorAll(".esi-alpha-nav");
-        const alphaHeader = document.querySelectorAll(".esi-alpha-header");
+        const alphaNavs = document.querySelectorAll(".eics-alpha-nav");
+        const alphaHeader = document.querySelectorAll(".eics-alpha-header");
         if (query.length > 0) {
             alphaNavs.forEach((nav) => (nav.style.display = "none"));
             alphaHeader.forEach((a) => (a.style.display = "none"));
@@ -163,10 +163,10 @@ document.addEventListener("DOMContentLoaded", function () {
             alphaHeader.forEach((a) => (a.style.display = ""));
         }
 
-        const alphaGroups = document.querySelectorAll(".esi-alpha-group");
+        const alphaGroups = document.querySelectorAll(".eics-alpha-group");
         alphaGroups.forEach((alphaGroup) => {
             const visibleIcons = alphaGroup.querySelectorAll(
-                '.esi-icon-item:not([style*="display: none"])'
+                '.eics-icon-item:not([style*="display: none"])'
             );
             if (visibleIcons.length > 0) {
                 alphaGroup.style.display = "flex";
@@ -178,9 +178,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const offsetTop = 120;
 
-    document.querySelectorAll(".esi-font-section").forEach((section) => {
-        const nav = section.querySelector(".esi-alpha-nav");
-        const links = nav.querySelectorAll(".esi-alpha-link");
+    document.querySelectorAll(".eics-font-section").forEach((section) => {
+        const nav = section.querySelector(".eics-alpha-nav");
+        const links = nav.querySelectorAll(".eics-alpha-link");
         const letterHeaders = Array.from(
             section.querySelectorAll('h3[id^="alpha-"]')
         );
@@ -215,13 +215,13 @@ document.addEventListener("DOMContentLoaded", function () {
         onScroll();
     });
 
-    const buttons = document.querySelectorAll(".esi-font-jump-btn");
+    const buttons = document.querySelectorAll(".eics-font-jump-btn");
 
     buttons.forEach((button) => {
         button.addEventListener("click", () => {
             const font = button.getAttribute("data-font");
             const targetSection = document.querySelector(
-                `.esi-font-section[data-font="${font}"]`
+                `.eics-font-section[data-font="${font}"]`
             );
             if (targetSection) {
                 targetSection.scrollIntoView({ behavior: "smooth" });

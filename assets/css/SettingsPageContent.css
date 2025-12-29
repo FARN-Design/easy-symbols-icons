@@ -1,90 +1,91 @@
 #default-fonts-popup {
-  display: none; /* Hidden by default, shown via JS */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6); /* dark translucent background */
-  z-index: 10000;
-  display: flex; /* use flexbox to center content */
-  justify-content: center;
-  align-items: center;
+    display: none; /* Hidden by default, shown via JS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); /* dark translucent background */
+    z-index: 10000;
+    display: flex; /* use flexbox to center content */
+    justify-content: center;
+    align-items: center;
 }
 
 #default-fonts-popup > div {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-  text-align: center;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    text-align: center;
 }
 
 #default-fonts-popup h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
 }
 
 #default-fonts-popup p {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  color: #333;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #333;
 }
 
 #default-fonts-popup > div > div {
-  background: #f1f1f1;
-  color: #555;
-  font-size: 0.85rem;
-  padding: 0.75rem;
-  margin: 1rem 0;
-  border-radius: 4px;
-  text-align: left;
+    background: #f1f1f1;
+    color: #555;
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    text-align: left;
 }
 
 #default-fonts-popup button {
-  margin: 0.5rem 0.25rem;
-  min-width: 140px;
-  cursor: pointer;
+    margin: 0.5rem 0.25rem;
+    min-width: 140px;
+    cursor: pointer;
 }
 
-#esi-icon-search, #esi-fonts-nav {
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 1000;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  border-bottom: 1px solid #ddd;
+#eics-icon-search,
+#eics-fonts-nav {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1000;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #ddd;
 }
-#esi-fonts-nav {
-  margin-bottom: 1em;
-}
-
-.esi-font-section h2 {
-  position: sticky;
-  top: 60px; /* Height of search + nav bars combined */
-  background: white;
-  z-index: 900;
-  margin-top: 0;
-  padding-top: 0.25em;
-  padding-bottom: 0.25em;
-  border-bottom: 1px solid #ccc;
+#eics-fonts-nav {
+    margin-bottom: 1em;
 }
 
-.esi-alpha-nav {
-  position: sticky;
-  top: 100px; /* slightly below h2 */
-  background: white;
-  z-index: 800;
-  margin-bottom: 1em;
-  border-bottom: 1px solid #eee;
+.eics-font-section h2 {
+    position: sticky;
+    top: 60px; /* Height of search + nav bars combined */
+    background: white;
+    z-index: 900;
+    margin-top: 0;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    border-bottom: 1px solid #ccc;
 }
 
-.esi-alpha-link.active {
-  font-weight: bold;
-  color: #0073aa; /* example highlight color */
-  text-decoration: underline;
+.eics-alpha-nav {
+    position: sticky;
+    top: 100px; /* slightly below h2 */
+    background: white;
+    z-index: 800;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #eee;
+}
+
+.eics-alpha-link.active {
+    font-weight: bold;
+    color: #0073aa; /* example highlight color */
+    text-decoration: underline;
 }

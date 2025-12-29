@@ -15,7 +15,7 @@ class Blocks {
     /**
      * Initializes block registration and sets up a custom REST API route.
      *
-     * Registers the "esi-icon" block during the 'init' action.
+     * Registers the "eics-icon" block during the 'init' action.
      * If registration is successful, it also registers a REST API endpoint
      * at /wp-json/easysymbolsicons/v1/fonts to return loaded font glyph mappings.
      *
@@ -23,10 +23,10 @@ class Blocks {
      */
 	public static function setup() {
 		add_action( 'init', function () {
-			$block_registered = register_block_type( __DIR__ . '/esi-icon/build/esi-icon' );
-			require_once __DIR__ . '/esi-shortcode/esi-shortcode.php';
+			$block_registered = register_block_type( __DIR__ . '/eics-icon/build/eics-icon' );
+			require_once __DIR__ . '/eics-shortcode/eics-shortcode.php';
 
-			add_shortcode('esi-icon', 'render_esi_icon_shortcode');
+			add_shortcode('eics-icon', 'render_eics_icon_shortcode');
 		} );
     }
 }

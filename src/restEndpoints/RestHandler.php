@@ -8,7 +8,7 @@ use Farn\EasySymbolsIcons\iconHandler\IconHandler;
 /**
  * Class Rest
  *
- * Handles REST API routes for EasyIcon.
+ * Handles REST API routes for EasySymbolsIcons.
  */
 class RestHandler {
 

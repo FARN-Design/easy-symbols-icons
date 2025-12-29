@@ -38,11 +38,11 @@ use Farn\EasySymbolsIcons\blocks\Blocks;
 use Farn\EasySymbolsIcons\iconHandler\IconHandler;
 use Farn\EasySymbolsIcons\restEndpoints\RestHandler;
 
-$plugin = new EasyIcon();
+$plugin = new EasySymbolsIcons();
 
-class EasyIcon
+class EasySymbolsIcons
 {
-    public static string $prefix = "esi_";
+    public static string $prefix = "eics_";
     public static string $software = "EasySymbolsIcon";
     public static string $pluginSlug = "easy-symbols-icons";
 
@@ -59,7 +59,7 @@ class EasyIcon
 
         self::$pluginDirPath = plugin_dir_path(__FILE__);
         self::$pluginBaseName = plugin_basename(__FILE__);
-        self::$pathToMainPluginFile = EasyIcon::$pluginDirPath . EasyIcon::$pluginSlug . ".php";
+        self::$pathToMainPluginFile = EasySymbolsIcons::$pluginDirPath . EasySymbolsIcons::$pluginSlug . ".php";
 
         Settings::setup();
         SettingsPage::getInstance();

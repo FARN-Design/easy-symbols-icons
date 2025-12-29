@@ -5,8 +5,8 @@ wp-tests-lib
 /.phpunit.result.cache
 .vscode/*
 **/build/**
-src/blocks/esi-icon/build/
-src/blocks/esi-icon/node_modules/
+src/blocks/eics-icon/build/
+src/blocks/eics-icon/node_modules/
 
 .idea/*
 .DS_Store
