@@ -559,7 +559,7 @@ class IconHandler {
             
             // temporary iterative assignment of backend css in case of subsetting failure to use as backup
             $backend_css_temp = '';
-            $backend_css_temp .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($original_font_path) ."') format('truetype');}";
+            $backend_css_temp .= "@font-face{font-family:'{$font_name}';src:url('". self::$iconsUrl ."/{$fontFolder}/" . basename($original_font_path) . "?v=" . filemtime($frontend_font_path) . "') format('truetype');}";
             $backend_css_temp .= '[class^="eics-' . strtolower($fontFolder) . '__"]{font-family:"' . $font_name . '";}';
 
             foreach ($font_mappings[$fontFolder] as $glyph_name => $unicode_hex) {
