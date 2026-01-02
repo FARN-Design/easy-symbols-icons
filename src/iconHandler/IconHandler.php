@@ -240,7 +240,9 @@ class IconHandler {
 
                 if (!empty($char_map) && !empty($font_glyphs)) {
                     foreach ($char_map as $unicode => $glyphIndex) {
-                        $glyph_name = isset($font_glyphs[$glyphIndex]) ? $font_glyphs[$glyphIndex] : 'uni' . strtoupper(dechex($unicode));
+                        $glyph_name = isset($font_glyphs[$glyphIndex])
+                            ? $font_glyphs[$glyphIndex]
+                            : 'uni' . dechex($unicode); // remove strtoupper
                         $glyphs_mapping[strtolower($glyph_name)] = '\\' . dechex($unicode);
                     }
                 } else {
@@ -248,23 +250,24 @@ class IconHandler {
 
                     if (!empty($ligature_map)) {
                         foreach ($ligature_map as $seq => $unicode) {
-                            $glyphs_mapping[$seq] = $unicode;
+                            $glyphs_mapping[strtolower($seq)] = $unicode;
                         }
                     } else {
                         error_log("Both char_map and ligature_map are empty for font '{$fontFolder}'");
                         foreach ($char_map as $unicode => $glyphIndex) {
-                            $glyphs_mapping['uni' . strtoupper(dechex($unicode))] = '\\' . dechex($unicode);
+                            $glyph_name = 'uni' . dechex($unicode);
+                            $glyphs_mapping[strtolower($glyph_name)] = '\\' . dechex($unicode);
                         }
                     }
                 }
 
                 if (!empty($glyphs_mapping)) {
-                    $font_mappings[$fontFolder] = $glyphs_mapping;
+                    $font_mappings[strtolower($fontFolder)] = $glyphs_mapping; // lowercase font name
                 }
 
             } catch (\Exception |\Error $e) {
                 error_log("Error loading font icons for '{$fontFolder}': " . $e->getMessage());
-                var_dump ($e->getTraceAsString());
+                var_dump($e->getTraceAsString());
             }
         }
 

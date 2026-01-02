@@ -50,7 +50,8 @@ function eics_render_icon_shortcode($attributes) {
         }
 
         if ($realFontKey !== null && isset($fonts[$realFontKey][$iconName])) {
-            return '<span class="eics-' . esc_attr($fontFamily) . '__' . esc_attr($iconName) . '"></span>';
+            // Force lowercase on the output class
+            return '<span class="eics-' . esc_attr(strtolower($fontFamily)) . '__' . esc_attr(strtolower($iconName)) . '"></span>';
         }
     }
 
@@ -64,7 +65,7 @@ function eics_render_icon_shortcode($attributes) {
 
         if (count($matches) === 1) {
             $fontFamily = sanitize_html_class(strtolower($matches[0]));
-            return '<span class="eics-' . esc_attr($fontFamily) . '__' . esc_attr($iconName) . '"></span>';
+            return '<span class="eics-' . esc_attr(strtolower($fontFamily)) . '__' . esc_attr(strtolower($iconName)) . '"></span>';
         } else if (count($matches) > 1) {
             error_log("Icon '{$iconName}' found in multiple fonts: " . implode(', ', $matches));
         } else {
@@ -74,4 +75,3 @@ function eics_render_icon_shortcode($attributes) {
 
     return '<span class="eics-icon">?</span>';
 }
-
