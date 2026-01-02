@@ -73,7 +73,7 @@ class IconHandler {
             return false;
         }
 
-        $fontName = sanitize_file_name($fontName);
+        $fontName = strtolower(sanitize_file_name($fontName));
 
         $fontDir = trailingslashit(self::$iconsDir) . preg_replace('/\.(otf|ttf)$/i', '', $fontName);
 
@@ -120,7 +120,6 @@ class IconHandler {
 
         return false;
     }
-
 
     /**
      * Removes a font from the system, deleting all its font files.
@@ -517,6 +516,7 @@ class IconHandler {
      * @return string|null The path to the font file, or null if not found.
      */
     private static function getFontFilePath(string $fontFolder): ?string {
+        $fontFolder = strtolower($fontFolder);
         $fontDir = self::$iconsDir . '/' . $fontFolder;
 
         $fontFileTtf = $fontDir . '/' . $fontFolder . '.ttf';
@@ -667,17 +667,16 @@ class IconHandler {
      * @return void
      */
     private static function generateUnifiedFontCSS(): void {
-
-        $enabled_fonts = self::getLoadedFonts();
+        $enabled_fonts = array_map('strtolower', self::getLoadedFonts()); // normalize loaded fonts
         if (empty($enabled_fonts)) {
             update_option('eics_prev_used_icons', self::get_used_icons(), false);
             update_option('eics_prev_loaded_fonts', [], false);
             return;
         }
 
-        $previous_loaded_fonts = get_option('eics_prev_loaded_fonts', []);
-        $used_icons = self::get_used_icons();
-        $previous_used_icons = get_option('eics_prev_used_icons', []);
+        $previous_loaded_fonts = array_map('strtolower', get_option('eics_prev_loaded_fonts', []));
+        $used_icons = array_map('strtolower', self::get_used_icons());
+        $previous_used_icons = array_map('strtolower', get_option('eics_prev_used_icons', []));
 
         sort($used_icons);
         sort($previous_used_icons);
@@ -689,7 +688,7 @@ class IconHandler {
 
         $disable_subsetting = get_option('eics_disable_dynamic_subsetting', false);
 
-        $font_mappings = self::getLoadedFontGlyphsMapping();
+        $font_mappings = array_change_key_case(self::getLoadedFontGlyphsMapping(), CASE_LOWER); // lowercase keys
         $frontend_css = '';
         $backend_css = [];
 
