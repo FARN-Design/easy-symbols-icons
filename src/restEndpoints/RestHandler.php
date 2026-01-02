@@ -22,6 +22,12 @@ class RestHandler {
             'permission_callback' => '__return_true',
         ]);
 
+        register_rest_route('easysymbolsicons/v1', '/used-icons', [
+            'methods'  => 'GET',
+            'callback' => [self::class, 'get_used_icons'],
+            'permission_callback' => '__return_true',
+        ]);
+
         register_rest_route('easysymbolsicons/v1', '/download-default-fonts', [
             'methods'  => 'POST',
             'callback' => [self::class, 'download_default_fonts'],
@@ -47,6 +53,24 @@ class RestHandler {
             ], 500);
         }
     }
+
+    /**
+     * Get used icons
+     * 
+     * @return WP_REST_Response
+     */
+    public static function get_used_icons() {
+        $icons = IconHandler::get_used_icons();
+
+        if (is_array($icons)) {
+            return new WP_REST_Response($icons, 200);
+        } else {
+            return new WP_REST_Response([
+                'error' => 'Invalid font data',
+            ], 500);
+        }
+    }
+
 
     /**
      * REST API callback: Initializes default fonts.

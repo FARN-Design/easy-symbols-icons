@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+
     const removeButtons = document.querySelectorAll(".remove-font");
 
     removeButtons.forEach((button) => {
@@ -126,55 +127,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const searchInput = document.getElementById("eics-icon-search");
 
-    searchInput.addEventListener("input", function () {
-        const query = this.value.toLowerCase();
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            const query = this.value.toLowerCase();
 
-        iconItems.forEach(function (item) {
-            const iconName = item.getAttribute("data-icon-name").toLowerCase();
-            const fontName = item.getAttribute("data-font-name").toLowerCase();
+            iconItems.forEach(function (item) {
+                const iconName = item.getAttribute("data-icon-name").toLowerCase();
+                const fontName = item.getAttribute("data-font-name").toLowerCase();
 
-            if (iconName.includes(query) || fontName.includes(query)) {
-                item.style.display = "block";
+                if (iconName.includes(query) || fontName.includes(query)) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+
+            const fontSections = document.querySelectorAll(".eics-font-section");
+
+            fontSections.forEach((section) => {
+                const visibleIcons = section.querySelectorAll(
+                    '.eics-icon-item:not([style*="display: none"])'
+                );
+                if (visibleIcons.length > 0) {
+                    section.style.display = "block";
+                } else {
+                    section.style.display = "none";
+                }
+            });
+
+            const alphaNavs = document.querySelectorAll(".eics-alpha-nav");
+            const alphaHeader = document.querySelectorAll(".eics-alpha-header");
+            if (query.length > 0) {
+                alphaNavs.forEach((nav) => (nav.style.display = "none"));
+                alphaHeader.forEach((a) => (a.style.display = "none"));
             } else {
-                item.style.display = "none";
+                alphaNavs.forEach((nav) => (nav.style.display = ""));
+                alphaHeader.forEach((a) => (a.style.display = ""));
             }
+
+            const alphaGroups = document.querySelectorAll(".eics-alpha-group");
+            alphaGroups.forEach((alphaGroup) => {
+                const visibleIcons = alphaGroup.querySelectorAll(
+                    '.eics-icon-item:not([style*="display: none"])'
+                );
+                if (visibleIcons.length > 0) {
+                    alphaGroup.style.display = "flex";
+                } else {
+                    alphaGroup.style.display = "none";
+                }
+            });
         });
-
-        const fontSections = document.querySelectorAll(".eics-font-section");
-
-        fontSections.forEach((section) => {
-            const visibleIcons = section.querySelectorAll(
-                '.eics-icon-item:not([style*="display: none"])'
-            );
-            if (visibleIcons.length > 0) {
-                section.style.display = "block";
-            } else {
-                section.style.display = "none";
-            }
-        });
-
-        const alphaNavs = document.querySelectorAll(".eics-alpha-nav");
-        const alphaHeader = document.querySelectorAll(".eics-alpha-header");
-        if (query.length > 0) {
-            alphaNavs.forEach((nav) => (nav.style.display = "none"));
-            alphaHeader.forEach((a) => (a.style.display = "none"));
-        } else {
-            alphaNavs.forEach((nav) => (nav.style.display = ""));
-            alphaHeader.forEach((a) => (a.style.display = ""));
-        }
-
-        const alphaGroups = document.querySelectorAll(".eics-alpha-group");
-        alphaGroups.forEach((alphaGroup) => {
-            const visibleIcons = alphaGroup.querySelectorAll(
-                '.eics-icon-item:not([style*="display: none"])'
-            );
-            if (visibleIcons.length > 0) {
-                alphaGroup.style.display = "flex";
-            } else {
-                alphaGroup.style.display = "none";
-            }
-        });
-    });
+    }
 
     const offsetTop = 120;
 
@@ -228,4 +231,30 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    const disableSubsettingCheckbox = document.getElementById(
+        "eics-disable-dynamic-subsetting"
+    );
+
+
+    if (disableSubsettingCheckbox) {
+        disableSubsettingCheckbox.addEventListener("change", () => {
+            fetch(EASYICONSYMBOLS.ajax_url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    action: "eics_save_dynamic_subsetting",
+                    nonce: EASYICONSYMBOLS.settings_nonce,
+                    value: disableSubsettingCheckbox.checked ? "1" : "0",
+                }),
+            }).catch(() => {
+                // rollback on failure
+                disableSubsettingCheckbox.checked =
+                    !disableSubsettingCheckbox.checked;
+                alert("Failed to save setting");
+            });
+        });
+    }
 });

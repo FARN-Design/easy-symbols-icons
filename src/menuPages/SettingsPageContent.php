@@ -79,7 +79,24 @@ function eics_displayGeneralTab() { ?>
 
     <hr>
 
-    <!-- Refresh All Used Icons -->
+    <label>
+        <input
+            type="checkbox"
+            id="eics-disable-dynamic-subsetting"
+            <?php checked(get_option('eics_disable_dynamic_subsetting', false)); ?>
+        >
+        <?php esc_html_e("Disable dynamic font subsetting", "easy-symbols-icons"); ?>
+    </label>
+
+    <p class="description">
+        <?php esc_html_e(
+            "When enabled, the full icon font will be loaded instead of generating subsets based on used icons.",
+            "easy-symbols-icons"
+        ); ?>
+    </p>
+
+    <hr>
+    
     <h2><?php esc_html_e("Refresh Icon Usage", "easy-symbols-icons"); ?></h2>
     <form method="post">
         <?php wp_nonce_field('refresh_easysymbolsicons_icons', 'refresh_icons_nonce'); ?>

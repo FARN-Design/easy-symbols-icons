@@ -4,6 +4,7 @@ namespace Farn\EasySymbolsIcons\menuPages;
 
 use EasySymbolsIcons;
 
+
 class SettingsPage {
 	
 	private static SettingsPage $instance;
@@ -41,6 +42,8 @@ class SettingsPage {
 				'rest_url'         => esc_url_raw(rest_url('easysymbolsicons/v1/download-default-fonts')),
 				'success_message'  => __('Default fonts downloaded successfully. Reloading...', 'easy-symbols-icons'),
 				'error_message'    => __('Failed to download default fonts.', 'easy-symbols-icons'),
+				'ajax_url'         => admin_url('admin-ajax.php'),
+				'settings_nonce'   => wp_create_nonce('eics_save_general_setting'),
 			]);
 
 			wp_enqueue_style(
@@ -49,6 +52,22 @@ class SettingsPage {
 				[],
 				'1.0'
 			);
+		});
+
+		add_action('wp_ajax_eics_save_dynamic_subsetting', function() {
+			if (
+				!isset($_POST['nonce']) ||
+				!wp_verify_nonce($_POST['nonce'], 'eics_save_general_setting')
+			) {
+				wp_send_json_error('Invalid nonce', 403);
+			}
+
+			update_option(
+				'eics_disable_dynamic_subsetting',
+				isset($_POST['value']) && $_POST['value'] === '1'
+			);
+
+			wp_send_json_success();
 		});
 	}
 	

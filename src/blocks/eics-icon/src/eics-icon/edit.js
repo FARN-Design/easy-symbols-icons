@@ -1,7 +1,7 @@
 import { useState, useEffect } from "@wordpress/element";
-import { TextControl } from "@wordpress/components";
+import { TextControl, PanelBody, PanelRow } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { BlockControls, AlignmentToolbar } from "@wordpress/block-editor";
+import { BlockControls, AlignmentToolbar, InspectorControls } from "@wordpress/block-editor";
 import { useBlockProps } from "@wordpress/block-editor";
 import "./editor.scss";
 
@@ -84,8 +84,23 @@ export default function Edit({ attributes, setAttributes }) {
 	};
 
 	const handleIconClick = (className) => {
-		setSelectedIcon({ className });
-		setAttributes({ className });
+		const matches = className.match(/^eics-([^\s]+)__([^\s]+)$/i);
+
+		if (!matches) {
+			console.warn("Invalid icon class:", className);
+			return;
+		}
+
+		const fontName = matches[1];
+		const iconName = matches[2];
+
+		setAttributes({
+			className,
+			font: fontName,
+			icon: iconName,
+		});
+
+		setSelectedIcon({ className, font: fontName, icon: iconName });
 	};
 
 	const blockProps = useBlockProps({
@@ -104,7 +119,7 @@ export default function Edit({ attributes, setAttributes }) {
 		for (const fontFolder in loadedFonts) {
 			const fontGlyphs = loadedFonts[fontFolder];
 			for (const glyphName in fontGlyphs) {
-				const expectedClass = `eics-${fontFolder.toLowerCase()}__${glyphName}`;
+				const expectedClass = `eics-${fontFolder.toLowerCase()}__${glyphName.toLowerCase()}`;
 				if (iconClassName === expectedClass) {
 					return true;
 				}
@@ -118,6 +133,40 @@ export default function Edit({ attributes, setAttributes }) {
 			<BlockControls>
 				<AlignmentToolbar value={align} onChange={handleAlignmentChange} />
 			</BlockControls>
+
+			<InspectorControls>
+				<PanelBody title={__("Selected Icon", "easy-symbols-icons")} initialOpen={true}>
+					<PanelRow>
+						{selectedIcon.className ? (
+							<>
+								<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+									<span
+										className={selectedIcon.className}
+										style={{ fontSize: "24px" }}
+									></span>
+
+									<div>
+										<p>
+											<strong>{__("Icon:", "easy-symbols-icons")}</strong>{" "}
+											{selectedIcon.icon || "-"}
+										</p>
+										<p>
+											<strong>{__("Font:", "easy-symbols-icons")}</strong>{" "}
+											{selectedIcon.font || "-"}
+										</p>
+										<p>
+											<strong>{__("Class:", "easy-symbols-icons")}</strong>{" "}
+											{selectedIcon.className}
+										</p>
+									</div>
+								</div>
+							</>
+						) : (
+							<p>{__("No icon selected", "easy-symbols-icons")}</p>
+						)}
+					</PanelRow>
+				</PanelBody>
+			</InspectorControls>
 
 			<div
 				{...blockProps}
@@ -166,7 +215,7 @@ export default function Edit({ attributes, setAttributes }) {
 									<summary>{font.fontFolder}</summary>
 									<div className="eics-font-icons">
 										{font.glyphs.map(([name], i) => {
-											const iconClass = `eics-${font.fontFolder.toLowerCase()}__${name}`;
+											const iconClass = `eics-${font.fontFolder.toLowerCase()}__${name.toLowerCase()}`;
 
 											return (
 												<span

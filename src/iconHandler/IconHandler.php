@@ -687,6 +687,7 @@ class IconHandler {
             return;
         }
 
+        $disable_subsetting = get_option('eics_disable_dynamic_subsetting', false);
 
         $font_mappings = self::getLoadedFontGlyphsMapping();
         $frontend_css = '';
@@ -727,6 +728,11 @@ class IconHandler {
             }
 
             $backend_css[] = $backend_css_temp;
+
+            if ($disable_subsetting) {
+                $frontend_css .= $backend_css_temp;
+                continue;
+            }
 
             // --- Frontend Subsetting ---
             $frontend_font_path = $font_dir . '/' . $fontFolder . '-frontend.ttf';
