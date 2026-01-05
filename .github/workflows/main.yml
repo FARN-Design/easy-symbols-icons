@@ -1,173 +1,171 @@
 name: Release Uploaded
 run-name: Release Uploaded to https://www.easy-wordpress-plugins.de.
 on:
-  release:
-    types: [published]
+    release:
+        types: [published]
 
 jobs:
-  test:
+    test:
+        name: Run Tests
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-versions: ["8.0"]
+        services:
+            mysql:
+                image: mysql:8.0
+                env:
+                    MYSQL_DATABASE: wp_test_db
+                    MYSQL_USER: wp_test_user
+                    MYSQL_PASSWORD: wp_test_password
+                    MYSQL_ROOT_PASSWORD: root_password
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        steps:
+            # Checkout repository
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-    name: Run Tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-versions: ['8.0']
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_DATABASE: wp_test_db
-          MYSQL_USER: wp_test_user
-          MYSQL_PASSWORD: wp_test_password
-          MYSQL_ROOT_PASSWORD: root_password
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    steps:
-      # Checkout repository
-      - name: Checkout code
-        uses: actions/checkout@v4
+            # Setup PHP environment
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  extensions: mbstring, intl, mysql, zip, dom, curl, libxml, mbstring, json
+                  coverage: xdebug
+                  tools: composer:v2
+                  ini-values: memory_limit=512M
 
-      # Setup PHP environment
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl, mysql, zip, dom, curl, libxml, mbstring, json
-          coverage: xdebug
-          tools: composer:v2
-          ini-values: memory_limit=512M
+            # Install system dependencies (combined to reduce apt-get update calls)
+            - name: Install system dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y mysql-client subversion
 
-      # Install system dependencies (combined to reduce apt-get update calls)
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mysql-client subversion
+            # Setup Node.js with caching
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: "npm"
 
-      # Setup Node.js with caching
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+            # Install npm dependencies with caching
+            - name: Install npm dependencies
+              run: npm ci
 
-      # Install npm dependencies with caching
-      - name: Install npm dependencies
-        run: npm ci
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+            # Setup Composer Authentication
+            - name: Setup Composer Authentication
+              run: composer config --global github-oauth.github.com ${{ secrets.FARN_CORE_TOKEN }}
 
-      # Setup Composer Authentication
-      - name: Setup Composer Authentication
-        run: composer config --global github-oauth.github.com ${{ secrets.FARN_CORE_TOKEN }}
+            # Cache Composer dependencies
+            - name: Cache Composer dependencies
+              uses: actions/cache@v3
+              with:
+                  path: vendor
+                  key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      composer-${{ runner.os }}-
 
-      # Cache Composer dependencies
-      - name: Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-${{ runner.os }}-
+            # Install Composer dependencies
+            - name: Install Composer Dependencies
+              run: composer install --prefer-dist --no-progress
 
-      # Install Composer dependencies
-      - name: Install Composer Dependencies
-        run: composer install --prefer-dist --no-progress
+            # Run tests
+            - name: Run Tests
+              run: scripts/do_tests.sh
 
-      # Run tests
-      - name: Run Tests
-        run: scripts/do_tests.sh
+            - name: Upload test results
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: test-results
+                  path: test-results
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: test-results
+    deploy:
+        name: Release New Version ${{ github.ref_name }}
+        runs-on: ubuntu-latest
+        needs: test
+        steps:
+            # Set environment variables
+            - name: Setup ENV
+              run: |
+                  echo "pluginSlug=easysymbolsicons" >> $GITHUB_ENV
+                  echo "pluginName=EasySymbolsIcons" >> $GITHUB_ENV
+                  echo "mainPluginFile=easysymbolsicons.php" >> $GITHUB_ENV
+                  echo "pluginFolder=easysymbolsicons" >> $GITHUB_ENV
 
-  deploy:
-    name: Release New Version ${{ github.ref_name }}
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      # Set environment variables
-      - name: Setup ENV
-        run: | 
-          echo "pluginSlug=easysymbolsicons" >> $GITHUB_ENV
-          echo "pluginName=EasyIcon" >> $GITHUB_ENV
-          echo "mainPluginFile=easysymbolsicons.php" >> $GITHUB_ENV
-          echo "pluginFolder=easysymbolsicons" >> $GITHUB_ENV
+            # Setup PHP environment
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.0"
+                  extensions: mbstring, intl
+                  tools: composer:v2
 
-      # Setup PHP environment
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.0'
-          extensions: mbstring, intl
-          tools: composer:v2
+            # Checkout repository
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                  path: ${{ env.pluginSlug }}
 
-      # Checkout repository
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.pluginSlug }}
+            # Update version in main plugin file
+            - name: Update Version Number
+              run: sed -i 's/.*Version.*/Version:\ ${{ github.ref_name }}/' ${{ env.pluginSlug }}/${{ env.mainPluginFile }}
 
-      # Update version in main plugin file
-      - name: Update Version Number
-        run: sed -i 's/.*Version.*/Version:\ ${{ github.ref_name }}/' ${{ env.pluginSlug }}/${{ env.mainPluginFile }}
+            # Setup Composer Authentication
+            - name: Setup Composer Authentication
+              run: composer config --global github-oauth.github.com ${{ secrets.FARN_CORE_TOKEN }}
 
-      # Setup Composer Authentication
-      - name: Setup Composer Authentication
-        run: composer config --global github-oauth.github.com ${{ secrets.FARN_CORE_TOKEN }}
+            # Install production dependencies only
+            - name: Install Production Dependencies
+              working-directory: ${{ env.pluginSlug }}
+              run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
 
-      # Install production dependencies only
-      - name: Install Production Dependencies
-        working-directory: ${{ env.pluginSlug }}
-        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+            # Clean up unnecessary files
+            - name: Remove Development Files
+              run: |
+                  rm -rf ${{ env.pluginSlug }}/.git
+                  rm -rf ${{ env.pluginSlug }}/.github
+                  rm -rf ${{ env.pluginSlug }}/tests
+                  rm -rf ${{ env.pluginSlug }}/phpunit.*
+                  rm -rf ${{ env.pluginSlug }}/scripts
+                  rm -rf ${{ env.pluginSlug }}/package*
+                  rm -rf ${{ env.pluginSlug }}/composer*
 
-      # Clean up unnecessary files
-      - name: Remove Development Files
-        run: |
-          rm -rf ${{ env.pluginSlug }}/.git
-          rm -rf ${{ env.pluginSlug }}/.github
-          rm -rf ${{ env.pluginSlug }}/tests
-          rm -rf ${{ env.pluginSlug }}/phpunit.*
-          rm -rf ${{ env.pluginSlug }}/scripts
-          rm -rf ${{ env.pluginSlug }}/package*
-          rm -rf ${{ env.pluginSlug }}/composer*
+            # Create zip package
+            - name: Package Plugin
+              uses: montudor/action-zip@v1
+              with:
+                  args: zip -qq -r ${{ env.pluginSlug }}.zip ${{ env.pluginSlug }}
 
-      # Create zip package
-      - name: Package Plugin
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r ${{ env.pluginSlug }}.zip ${{ env.pluginSlug }}
+            # Deploy to server
+            - name: Deploy to Server
+              run: |
+                  curl --location --max-redirs 3 -v \
+                  -F pluginName="${{ env.pluginName }}" \
+                  -F pluginVersion="${{ github.ref_name }}" \
+                  -F pluginSlug="${{ env.pluginSlug }}" \
+                  -F fileName=${{ env.pluginSlug }}.zip \
+                  -F file=@./${{ env.pluginSlug }}.zip \
+                  https://www.farnlabs.de/wp-json/farnToolbox/v1/storeRelease
 
-      # Deploy to server
-      - name: Deploy to Server
-        run: |
-          curl --location --max-redirs 3 -v \
-          -F pluginName="${{ env.pluginName }}" \
-          -F pluginVersion="${{ github.ref_name }}" \
-          -F pluginSlug="${{ env.pluginSlug }}" \
-          -F fileName=${{ env.pluginSlug }}.zip \
-          -F file=@./${{ env.pluginSlug }}.zip \
-          https://www.farnlabs.de/wp-json/farnToolbox/v1/storeRelease
+            - name: Upload Release Asset
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.FARN_CORE_TOKEN }}
+              with:
+                  upload_url: ${{ github.event.release.upload_url }}
+                  asset_path: ./${{ env.pluginSlug }}.zip
+                  asset_name: ${{ env.pluginSlug }}.zip
+                  asset_content_type: application/zip
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.FARN_CORE_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ env.pluginSlug }}.zip
-          asset_name: ${{ env.pluginSlug }}.zip
-          asset_content_type: application/zip
-
-
-      # Confirmation message
-      - name: Deployment Confirmation
-        run: echo "✅ Release ${{ github.ref_name }} successfully uploaded to https://www.farnlabs.de"
+            # Confirmation message
+            - name: Deployment Confirmation
+              run: echo "✅ Release ${{ github.ref_name }} successfully uploaded to https://www.farnlabs.de"
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}

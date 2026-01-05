@@ -2,6 +2,9 @@
 
 namespace Farn\EasySymbolsIcons\menuPages;
 
+use EasySymbolsIcons;
+
+
 class SettingsPage {
 	
 	private static SettingsPage $instance;
@@ -10,10 +13,10 @@ class SettingsPage {
 
 		add_action( 'admin_menu', function(){
 			add_menu_page(
-				__( 'Easy Symbols & Icons Settings', 'easysymbolsicons' ),
-				__( 'Easy Symbols & Icons Settings', 'easysymbolsicons' ),
+				__( 'Easy Symbols & Icons Settings', 'easy-symbols-icons' ),
+				__( 'Easy Symbols & Icons Settings', 'easy-symbols-icons' ),
 				'manage_options',
-				\EasyIcon::$prefix.'settings-page',
+				\EasySymbolsIcons::$prefix.'settings-page',
 				function (){ include("SettingsPageContent.php"); },
 				'',
 				99
@@ -21,32 +24,50 @@ class SettingsPage {
 		});
 
 		add_action('admin_enqueue_scripts', function ($hook_suffix) {
-			if (strpos($hook_suffix, 'esi_settings-page') === false) {
+			if (strpos($hook_suffix, 'eics_settings-page') === false) {
 				return;
 			}
 
 			wp_enqueue_script(
 				'SettingsPageContent.js',
-				plugin_dir_url( dirname(__DIR__, 2) ) . 'easysymbolsicons/assets/js/SettingsPageContent.js',
+				plugin_dir_url(EasySymbolsIcons::$pathToMainPluginFile) . 'assets/js/SettingsPageContent.js',
 				[],
 				'1.0',
 				true
 			);
 
-			wp_localize_script('SettingsPageContent.js', 'EASYICON', [
+			wp_localize_script('SettingsPageContent.js', 'EASYICONSYMBOLS', [
 				'remove_nonce'     => wp_create_nonce('remove_easysymbolsicons_font'),
 				'rest_nonce'       => wp_create_nonce('wp_rest'),
 				'rest_url'         => esc_url_raw(rest_url('easysymbolsicons/v1/download-default-fonts')),
-				'success_message'  => __('Default fonts downloaded successfully. Reloading...', 'easysymbolsicons'),
-				'error_message'    => __('Failed to download default fonts.', 'easysymbolsicons'),
+				'success_message'  => __('Default fonts downloaded successfully. Reloading...', 'easy-symbols-icons'),
+				'error_message'    => __('Failed to download default fonts.', 'easy-symbols-icons'),
+				'ajax_url'         => admin_url('admin-ajax.php'),
+				'settings_nonce'   => wp_create_nonce('eics_save_general_setting'),
 			]);
 
 			wp_enqueue_style(
 				'SettingsPageContent.css',
-				plugin_dir_url( dirname(__DIR__, 2) ) . 'easysymbolsicons/assets/css/SettingsPageContent.css',
+				plugin_dir_url(EasySymbolsIcons::$pathToMainPluginFile) . '/assets/css/SettingsPageContent.css',
 				[],
 				'1.0'
 			);
+		});
+
+		add_action('wp_ajax_eics_save_dynamic_subsetting', function() {
+			if (
+				!isset($_POST['nonce']) ||
+				!wp_verify_nonce($_POST['nonce'], 'eics_save_general_setting')
+			) {
+				wp_send_json_error('Invalid nonce', 403);
+			}
+
+			update_option(
+				'eics_disable_dynamic_subsetting',
+				isset($_POST['value']) && $_POST['value'] === '1'
+			);
+
+			wp_send_json_success();
 		});
 	}
 	

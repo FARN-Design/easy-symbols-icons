@@ -1,9 +1,6 @@
 <?php
 
 namespace Farn\EasySymbolsIcons\blocks;
-use Farn\EasySymbolsIcons\iconHandler\IconHandler;
-use WP_Post;
-use WP_REST_Response;
 
 /**
  * Class Blocks
@@ -15,7 +12,7 @@ class Blocks {
     /**
      * Initializes block registration and sets up a custom REST API route.
      *
-     * Registers the "esi-icon" block during the 'init' action.
+     * Registers the "eics-icon" block during the 'init' action.
      * If registration is successful, it also registers a REST API endpoint
      * at /wp-json/easysymbolsicons/v1/fonts to return loaded font glyph mappings.
      *
@@ -23,10 +20,10 @@ class Blocks {
      */
 	public static function setup() {
 		add_action( 'init', function () {
-			$block_registered = register_block_type( __DIR__ . '/esi-icon/build/esi-icon' );
-			require_once __DIR__ . '/esi-shortcode/esi-shortcode.php';
+			register_block_type( __DIR__ . '/eics-icon/build/eics-icon' );
 
-			add_shortcode('esi-icon', 'render_esi_icon_shortcode');
+			require_once __DIR__ . '/eics-shortcode/eics-shortcode.php';
+			add_shortcode('eics-icon', 'eics_render_icon_shortcode');
 		} );
     }
 }

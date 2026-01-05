@@ -12,7 +12,7 @@ A simple WordPress plugin to manage and use icon fonts via a block editor with e
 
 == Description ==
 
-Easy Icon Fonts allows you to easily manage icon fonts on your WordPress site. Select from preloaded icon fonts or upload your own custom TTF and OTF fonts. Use the included `esi-icon` block to add icons to your posts and pages with ease.
+Easy Icon Fonts allows you to easily manage icon fonts on your WordPress site. Select from preloaded icon fonts or upload your own custom TTF and OTF fonts. Use the included `eics-icon` block to add icons to your posts and pages with ease.
 
 Features include:
 * Upload and management of custom icon fonts
@@ -33,7 +33,7 @@ Features include:
 1. Go to the Easy Icon Fonts settings page in the WordPress admin view.
 2. Under the "Font Select" tab, upload your custom fonts or select from the default fonts.
 3. Save your settings.
-4. In the WordPress block editor, add the `esi-icon` block to your content.
+4. In the WordPress block editor, add the `eics-icon` block to your content.
 5. Click the block to open the icon selector and choose your desired icon.
 
 == Screenshots ==

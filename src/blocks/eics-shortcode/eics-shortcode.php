@@ -1,13 +1,13 @@
 <?php
 
-function render_esi_icon_shortcode($attributes) {
+function eics_render_icon_shortcode($attributes) {
     $attributes = shortcode_atts([
         'icon' => '',
     ], $attributes);
 
     $iconKey = trim($attributes['icon']);
     if (empty($iconKey)) {
-        return '<span class="esi-icon">?</span>';
+        return '<span class="eics-icon">?</span>';
     }
 
     $fontFamily = '';
@@ -28,7 +28,7 @@ function render_esi_icon_shortcode($attributes) {
     }
 
     if (is_wp_error($response)) {
-        return '<span class="esi-icon">?</span>';
+        return '<span class="eics-icon">?</span>';
     }
 
     $body = wp_remote_retrieve_body($response);
@@ -36,7 +36,7 @@ function render_esi_icon_shortcode($attributes) {
 
     if (!is_array($fonts)) {
         error_log('Failed to decode JSON response for loaded fonts: ' . $body);
-        return '<span class="esi-icon">?</span>';
+        return '<span class="eics-icon">?</span>';
     }
 
     if (!empty($fontFamily)) {
@@ -50,7 +50,8 @@ function render_esi_icon_shortcode($attributes) {
         }
 
         if ($realFontKey !== null && isset($fonts[$realFontKey][$iconName])) {
-            return '<span class="esi-' . esc_attr($fontFamily) . '-' . esc_attr($iconName) . '"></span>';
+            // Force lowercase on the output class
+            return '<span class="eics-' . esc_attr(strtolower($fontFamily)) . '__' . esc_attr(strtolower($iconName)) . '"></span>';
         }
     }
 
@@ -64,7 +65,7 @@ function render_esi_icon_shortcode($attributes) {
 
         if (count($matches) === 1) {
             $fontFamily = sanitize_html_class(strtolower($matches[0]));
-            return '<span class="esi-' . esc_attr($fontFamily) . '-' . esc_attr($iconName) . '"></span>';
+            return '<span class="eics-' . esc_attr(strtolower($fontFamily)) . '__' . esc_attr(strtolower($iconName)) . '"></span>';
         } else if (count($matches) > 1) {
             error_log("Icon '{$iconName}' found in multiple fonts: " . implode(', ', $matches));
         } else {
@@ -72,6 +73,5 @@ function render_esi_icon_shortcode($attributes) {
         }
     }
 
-    return '<span class="esi-icon">?</span>';
+    return '<span class="eics-icon">?</span>';
 }
-

@@ -1,90 +1,227 @@
 #default-fonts-popup {
-  display: none; /* Hidden by default, shown via JS */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6); /* dark translucent background */
-  z-index: 10000;
-  display: flex; /* use flexbox to center content */
-  justify-content: center;
-  align-items: center;
+    display: none; /* Hidden by default, shown via JS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); /* dark translucent background */
+    z-index: 10000;
+    display: flex; /* use flexbox to center content */
+    justify-content: center;
+    align-items: center;
 }
 
 #default-fonts-popup > div {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-  text-align: center;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    text-align: center;
 }
 
 #default-fonts-popup h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
 }
 
 #default-fonts-popup p {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  color: #333;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #333;
 }
 
 #default-fonts-popup > div > div {
-  background: #f1f1f1;
-  color: #555;
-  font-size: 0.85rem;
-  padding: 0.75rem;
-  margin: 1rem 0;
-  border-radius: 4px;
-  text-align: left;
+    background: #f1f1f1;
+    color: #555;
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    text-align: left;
 }
 
 #default-fonts-popup button {
-  margin: 0.5rem 0.25rem;
-  min-width: 140px;
-  cursor: pointer;
+    margin: 0.5rem 0.25rem;
+    min-width: 140px;
+    cursor: pointer;
 }
 
-#esi-icon-search, #esi-fonts-nav {
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 1000;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  border-bottom: 1px solid #ddd;
+/* available icons tab */
+.eics-sticky-filter-bar {
+    margin-top: 2rem;
+    position: sticky;
+    top: 32px;
+    background: white;
+    z-index: 1000;
+    padding:1rem;
+    display: flex;
+    gap:0.5rem;
+    align-items: center;
+    justify-content: center;
 }
-#esi-fonts-nav {
-  margin-bottom: 1em;
+.eics-sticky-filter-bar #eics-icon-search {
+    appearance: none;
+    border:1px solid #888 !important;
+    box-shadow: none;
+    border-radius: 0;
+    display: inline-block;
+    width: 300px !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+    font-size: 1rem;
+}
+.eics-sticky-filter-bar #eics-fonts-nav {
+    margin-bottom: 0 !important;
+}
+.eics-sticky-filter-bar .eics-font-jump-btn {
+    appearance: none;
+    border:none;
+    box-shadow: none;
+    border-radius: 5px;
+    background: #eee;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    line-height: 1.2;
+    font-size: 1rem;
+    border:1px solid #eee;
+}
+.eics-sticky-filter-bar .eics-font-jump-btn:hover {
+    background: #ddd;
+    border-color: #ddd;
 }
 
-.esi-font-section h2 {
-  position: sticky;
-  top: 60px; /* Height of search + nav bars combined */
-  background: white;
-  z-index: 900;
-  margin-top: 0;
-  padding-top: 0.25em;
-  padding-bottom: 0.25em;
-  border-bottom: 1px solid #ccc;
+.eics-font-section .eics-font-section-sticky-bar {
+    position: sticky;
+    top: 100px;
+    background-color: transparent;
+    z-index: 900;
+    padding:0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap:1rem;
+    border-top: 1px solid transparent;
+    justify-content: center;
+}
+.eics-font-section h2 {
+    margin:0;
+    font-size: 1rem;
+    font-weight: normal;
+}
+.eics-font-section .eics-alpha-nav {
+    margin-bottom: 0 !important;
+}
+.eics-font-section .eics-font-section-sticky-bar:has(.eics-alpha-link.active) {
+    background-color: white;
+    border-top: 2px solid #ccc;
+}
+.eics-font-section .eics-alpha-nav .eics-alpha-link {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;
+    border-radius: 50%;
+    background-color: #ccc;
+    text-decoration: none;
+    color:black;
+}
+.eics-font-section .eics-font-section-sticky-bar:has(.eics-alpha-link.active) .eics-alpha-link {
+    background-color: #eee;
+}
+.eics-font-section  .eics-alpha-link.active {
+    background-color:black !important;
+    color:white;
+}
+.eics-font-section .eics-alpha-nav .eics-alpha-link:hover {
+    background-color: #bbb !important;
+}
+#eics-icons-wrapper .eics-alpha-group{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem 1rem;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+#eics-icons-wrapper .eics-icon-item {
+    flex:0 0 120px;
+    cursor: pointer;
+    max-width: 120px;
+}
+#eics-icons-wrapper .eics-icon-item span{
+    display: block;
+    text-align: center;
+    hyphens: auto;
+    font-size: 1.5rem;
+}
+#eics-icons-wrapper .eics-icon-item .eics-icon-label {
+    font-size: 0.6rem;
+}
+#eics-icons-wrapper .eics-alpha-header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+#eics-icons-wrapper .eics-alpha-header {
+    font-size: 1.2rem;
+    background-color: #ccc;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    line-height: 1;
 }
 
-.esi-alpha-nav {
-  position: sticky;
-  top: 100px; /* slightly below h2 */
-  background: white;
-  z-index: 800;
-  margin-bottom: 1em;
-  border-bottom: 1px solid #eee;
+
+/* Font select tab */
+.uploaded-font-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 0.5rem;
+    gap:0.5rem;
+}
+.uploaded-font-item button.remove-font {
+    border:none;
+    background: none;
+    appearance: none;
+    padding:0.2rem;
+    border-radius: 0;
+    line-height: 1;
+    color:#ccc;
 }
 
-.esi-alpha-link.active {
-  font-weight: bold;
-  color: #0073aa; /* example highlight color */
-  text-decoration: underline;
+.eics-tab-content:has(.upload-font-form):has(.select-font-form) {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding-top:2rem;
+}
+.upload-font-form,
+.select-font-form {
+    background-color: white;
+    padding:2rem;
+    width: auto;
+    display: inline-block;;
+}
+.upload-font-form h2,
+.select-font-form h2 {
+    margin-top: 0;
+    margin-bottom: 2rem;
+}
+.upload-font-form input[type="submit"],
+.select-font-form input[type="submit"]{
+    margin-top: 2rem;
+    display: block;
 }

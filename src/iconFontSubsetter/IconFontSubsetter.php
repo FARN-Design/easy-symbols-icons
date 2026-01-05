@@ -1,6 +1,6 @@
 <?php
 
-namespace Farn\EasyIconFonts\iconFontSubsetter;
+namespace Farn\EasySymbolsIcons\iconFontSubsetter;
 
 use FontLib\Font;
 use FontLib\BinaryStream;
@@ -20,8 +20,11 @@ class IconFontSubsetter {
     private string $subsetString = '';
 
     public function __construct(string $fontPath) {
-        if (!file_exists($fontPath)) {
-            throw new Exception("Font file not found: $fontPath");
+        if ( ! file_exists( $fontPath ) ) {
+            throw new Exception( sprintf(
+                esc_html__( 'Font file not found: %s', 'easy-symbols-icons' ),
+                esc_html( $fontPath )
+            ) );
         }
         $this->sourceFontPath = $fontPath;
     }
@@ -117,8 +120,12 @@ class IconFontSubsetter {
         if (preg_match('/^(?:0x)?([0-9A-Fa-f]+)$/i', $unicode, $m)) return hexdec($m[1]);
         // Match literal \uXXXX in the string
         if (preg_match('/^\\\\u([0-9A-Fa-f]{4})$/i', $unicode, $m)) return hexdec($m[1]);
-        // Match literal \XXXX (your format like \E194)
-        if (preg_match('/^\\\\([0-9A-Fa-f]{4,6})$/i', $unicode, $m)) return hexdec($m[1]);
+        // Match literal \XXXX (CSS-style, 1–6 digits)
+        if (preg_match('/^\\\\([0-9A-Fa-f]{1,6})$/i', $unicode, $m)) {
+            // Pad to at least 4 digits internally
+            $hex = str_pad($m[1], 4, '0', STR_PAD_LEFT);
+            return hexdec($hex);
+        }
         if (is_numeric($unicode)) return intval($unicode);
         return false;
     }
