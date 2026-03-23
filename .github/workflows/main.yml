@@ -35,6 +35,11 @@ jobs:
           rm -rf ${{ env.pluginSlug }}/package*
           rm -rf ${{ env.pluginSlug }}/composer*
 
+      - name: Verify final plugin contents
+        run: |
+          pwd
+          find . -maxdepth 3 | sort
+
       - name: WordPress Plugin Deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
         env:
