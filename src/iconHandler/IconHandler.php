@@ -792,7 +792,6 @@ class IconHandler {
             $font_file = self::getFontFilePath($fontFolder);
 
             if (empty($font_file)) {
-                error_log("No valid font file found in {$font_dir}");
                 continue;
             }
 
