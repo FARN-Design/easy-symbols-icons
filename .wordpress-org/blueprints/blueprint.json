@@ -1,0 +1,31 @@
+{
+  "landingPage": "/wp-admin/admin.php?page=eics_settings-page&tab=general",
+  "features": {
+    "networking" : true
+  },
+  "preferredVersions": {
+    "php": "8.4",
+    "wp": "latest"
+  },
+  "phpExtensionBundles": [
+    "kitchen-sink"
+  ],
+  "login": true,
+  "steps": [
+    {
+      "step": "installPlugin",
+        "pluginData": {
+          "resource": "wordpress.org/plugins",
+          "slug": "easy-symbols-icons"
+        },
+        "options": {
+          "activate": true
+        }
+      },
+    {
+      "step": "login",
+        "username": "admin",
+        "password": "password"
+    }
+  ]
+}

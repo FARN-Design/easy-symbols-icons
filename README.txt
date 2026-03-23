@@ -1,6 +1,6 @@
 === Easy Symbols & Icons ===
 Contributors: farndesign
-Tags: icons, icon fonts, dynamic subsetting, performance, Gutenberg, webfonts
+Tags: icons, icon fonts, dynamic subsetting, performance, font management, webfonts
 Requires at least: 6.2
 Tested up to: 6.9
 Stable tag: 1.0.0
