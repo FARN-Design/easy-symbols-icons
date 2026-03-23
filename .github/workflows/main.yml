@@ -25,16 +25,16 @@ jobs:
       - name: Remove Development Files
         run: |
           pwd
-          rm -rf ${{ env.pluginSlug }}/.git
-          rm -rf ${{ env.pluginSlug }}/.github
-          rm -rf ${{ env.pluginSlug }}/.idea
-          rm -rf ${{ env.pluginSlug }}/.gitignore
-          rm -rf ${{ env.pluginSlug }}/tests
-          rm -rf ${{ env.pluginSlug }}/bin
-          rm -rf ${{ env.pluginSlug }}/phpunit.*
-          rm -rf ${{ env.pluginSlug }}/scripts
-          rm -rf ${{ env.pluginSlug }}/package*
-          rm -rf ${{ env.pluginSlug }}/composer*
+          rm -rf ./.git
+          rm -rf ./.github
+          rm -rf ./.idea
+          rm -rf ./.gitignore
+          rm -rf ./tests
+          rm -rf ./bin
+          rm -rf ./phpunit.*
+          rm -rf ./scripts
+          rm -rf ./package*
+          rm -rf ./composer*
 
       - name: Verify final plugin contents
         run: |
