@@ -24,9 +24,11 @@ function generateRandomHash() {
 }
 
 export default function Edit({ attributes, setAttributes }) {
-	const { fontSize, lineHeight, align, backgroundColor, textColor, className } =
+	const { fontSize, lineHeight, align, backgroundColor, textColor, className,
+	iconClass } =
 		attributes;
 	const blockId = useRef(generateRandomHash()).current;
+	const resolvedIconClass = iconClass || className;
 
 	const [fonts, setFonts] = useState({});
 	const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ export default function Edit({ attributes, setAttributes }) {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [isPickerOpen, setIsPickerOpen] = useState(false);
 	const [selectedIcon, setSelectedIcon] = useState(() =>
-		className ? { className } : {}
+		resolvedIconClass ? { className: resolvedIconClass } : {}
 	);
 
 	useEffect(() => {
@@ -107,7 +109,8 @@ export default function Edit({ attributes, setAttributes }) {
 		const iconName = matches[2];
 
 		setAttributes({
-			className,
+			iconClass: className, // ✅ new
+			className: undefined, // ✅ clean old (important)
 			font: fontName,
 			icon: iconName,
 		});
@@ -138,8 +141,8 @@ export default function Edit({ attributes, setAttributes }) {
 	};
 
 	const isValidIcon =
-		className &&
-		(loading || isIconValid(className, fonts));
+		resolvedIconClass &&
+		(loading || isIconValid(resolvedIconClass, fonts));
 
 	return (
 		<>
@@ -157,11 +160,11 @@ export default function Edit({ attributes, setAttributes }) {
 			<InspectorControls>
 				<PanelBody title={__("Selected Icon", "easy-symbols-icons")} initialOpen={true}>
 					<PanelRow>
-						{selectedIcon.className ? (
+						{resolvedIconClass ? (
 							<>
 								<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 									<span
-										className={selectedIcon.className}
+										className={resolvedIconClass}
 										style={{ fontSize: "24px" }}
 									></span>
 
@@ -176,7 +179,7 @@ export default function Edit({ attributes, setAttributes }) {
 										</p>
 										<p>
 											<strong>{__("Class:", "easy-symbols-icons")}</strong>{" "}
-											{selectedIcon.className}
+											{resolvedIconClass}
 										</p>
 									</div>
 								</div>
@@ -191,10 +194,10 @@ export default function Edit({ attributes, setAttributes }) {
 			<div
 				{...blockProps}
 			>
-				{selectedIcon.className &&
+				{resolvedIconClass &&
 				isValidIcon ? (
 					<button
-						className={selectedIcon.className + " eics-select-button-has-icon"}
+						className={resolvedIconClass + " eics-select-button-has-icon"}
 						style={{
 							cursor: "pointer",
 							color: textColor || undefined,
@@ -204,8 +207,8 @@ export default function Edit({ attributes, setAttributes }) {
 				) : (
 					<button
 						className={
-							selectedIcon.className
-								? selectedIcon.className + " eics-select-button-has-icon"
+							resolvedIconClass
+								? resolvedIconClass + " eics-select-button-has-icon"
 								: "eics-select-button"
 						}
 						style={{
@@ -262,7 +265,7 @@ export default function Edit({ attributes, setAttributes }) {
 												<span
 													key={i}
 													className="eics-font-icon"
-													onClick={() => handleIconClick(iconClass)} // Select icon on click
+													onClick={() => handleIconClick(iconClass)}
 													style={{
 														cursor: "pointer",
 														fontSize: "20px",
