@@ -4,6 +4,7 @@ import { __ } from "@wordpress/i18n";
 import { BlockControls, AlignmentToolbar, InspectorControls } from "@wordpress/block-editor";
 import { useBlockProps } from "@wordpress/block-editor";
 import "./editor.scss";
+import { getFonts } from "./utils/fontsStore";
 
 function generateRandomHash() {
 	return (
@@ -24,53 +25,41 @@ export default function Edit({ attributes, setAttributes }) {
 
 	const [selectedIcon, setSelectedIcon] = useState({ className });
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				let response = await fetch("/wp-json/easysymbolsicons/v1/loaded-fonts");
+		useEffect(() => {
+	let mounted = true;
 
-				if (!response.ok) {
-					response = await fetch("/?rest_route=/easysymbolsicons/v1/loaded-fonts");
-				}
+	getFonts()
+		.then((json) => {
+			if (!mounted) return;
 
-				if (!response.ok) {
-					throw new Error(`HTTP error ${response.status}`);
-				}
-
-				const text = await response.text();
-				let json;
-
-				try {
-					json = JSON.parse(text);
-				} catch {
-					json = [];
-				}
-
-				if (Array.isArray(json) && json.length === 0) {
-					setError(
-						<span>
-							No fonts found. Please visit the{' '}
-							<a href="/wp-admin/admin.php?page=eics_settings-page&tab=fontselect">
-								font selection page
-							</a>{' '}
-							to add fonts.
-						</span>
-					);
-				} else if (json && typeof json === "object") {
-					setFonts(json);
-				} else {
-					setError("Data is not in the expected format.");
-				}
-
-				setLoading(false);
-			} catch (error) {
-				setError("Failed to fetch fonts");
-				setLoading(false);
-				console.error(error);
+			if (Array.isArray(json) && json.length === 0) {
+				setError(
+					<span>
+						No fonts found. Please visit the{" "}
+						<a href="/wp-admin/admin.php?page=eics_settings-page&tab=fontselect">
+							font selection page
+						</a>{" "}
+						to add fonts.
+					</span>
+				);
+			} else if (json && typeof json === "object") {
+				setFonts(json);
+			} else {
+				setError("Data is not in the expected format.");
 			}
-		};
 
-		fetchData();
+			setLoading(false);
+		})
+		.catch((error) => {
+			if (!mounted) return;
+			setError("Failed to fetch fonts");
+			setLoading(false);
+			console.error(error);
+		});
+
+		return () => {
+			mounted = false;
+		};
 	}, []);
 
 	const filteredFonts = Object.keys(fonts)
