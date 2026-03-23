@@ -68,20 +68,61 @@ class EasySymbolsIcons
 
         add_action('rest_api_init', [RestHandler::class, 'register_routes']);
 
-        // Hook to save post and update icon usage
-        add_action('save_post', [IconHandler::class, 'update_icon_usage_per_post'], 10, 3);
-
-        add_action('before_delete_post', [IconHandler::class, 'update_icon_usage_removal_post']);
+        self::registerIconUsageCallbacks();
 
         //Activation and Deactivation
         register_activation_hook( __FILE__, [self::class, "pluginActivation"] );
         register_deactivation_hook( __FILE__, [self::class, "pluginDeactivation"] );
     }
 
-    public static function pluginActivation():void {
+    public static function registerIconUsageCallbacks(): void {
+        add_action('save_post', [IconHandler::class, 'update_icon_usage_per_post'], 10, 3);
+
+        add_action('before_delete_post', [IconHandler::class, 'update_icon_usage_removal_post']);
+
+        add_action('wp_update_nav_menu', function (int $menu_id) {
+            ob_start();
+            wp_nav_menu([
+                'menu' => $menu_id,
+                'echo' => true,
+                'fallback_cb' => false,
+            ]);
+            $markup = ob_get_clean();
+            IconHandler::update_icon_usage_per_object('nav_menu', $menu_id, $markup);
+        });
+
+        add_filter(
+            'widget_update_callback',
+            function ($instance, $new_instance, $old_instance, $widget) {
+                ob_start();
+                the_widget(get_class($widget), $new_instance);
+                $markup = ob_get_clean();
+                IconHandler::update_icon_usage_per_object('widget', $widget->id, $markup);
+                return $instance;
+            },
+            10,
+            4
+        );
+
+        add_filter('dynamic_sidebar_params', function ($params) {
+            ob_start();
+            the_widget($params[0]['widget_class'], $params[0]['widget_options'] ?? []);
+            $markup = ob_get_clean();
+            IconHandler::update_icon_usage_per_object('widget', $params[0]['widget_id'], $markup);
+            return $params;
+        });
+
+        add_action('save_post', function ($post_id, $post, $update) {
+            if (in_array($post->post_type, ['wp_template', 'wp_template_part'], true)) {
+                IconHandler::update_icon_usage_per_post($post_id, $post, $update);
+            }
+        }, 10, 3);
+    }
+
+    public static function pluginActivation(): void {
         IconHandler::update_icon_usage_all();
     }
 
-    public static function pluginDeactivation():void {
+    public static function pluginDeactivation(): void {
     }
 }

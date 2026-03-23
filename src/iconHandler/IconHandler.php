@@ -288,50 +288,41 @@ class IconHandler {
     }
 
     /**
-     * Extracts icon class names from the given content.
+     * Extracts icon class names from the given content. HTML or Wordpress Markup
      *
      * @param string $content The content to extract icons from.
      * 
      * @return array An array of unique icon class names found in the content.
      */
     private static function extract_icons_from_content(string $content): array {
-        $icons = [];
-
-        // Shortcodes
-        if (preg_match_all(
-            '/\[eics-icon\s+icon=["\'](eics-[a-zA-Z0-9_-]+|[a-zA-Z0-9_-]+)["\']\]/i',
-            $content,
-            $matches
-        )) {
-            foreach ($matches[1] as $icon) {
-                if (strpos($icon, 'eics-') !== 0) {
-                    $icon = 'eics-' . $icon;
-                }
-                $icons[] = $icon;
-            }
+        if ($content === '') {
+            return [];
         }
 
-        // CSS classes
-        if (preg_match_all(
-            '/class=["\'][^"\']*?(eics-[a-zA-Z0-9_-]+)[^"\']*?["\']/i',
-            $content,
-            $matches
-        )) {
-            foreach ($matches[1] as $icon) {
-                if (
-                    preg_match('/eics-icon-fonts$/i', $icon) ||
-                    preg_match('/^wp-block-easy-symbols-icons-eics-symbols-icons/i', $icon)
-                ) {
-                    continue;
-                }
+        // render content with shortcodes, blocks and filters
+        $content = apply_filters( 'the_content', $content );
+        
+        $icons = [];
 
-                $icons[] = $icon;
+        // HTML class attributes
+        if (preg_match_all('/class\s*=\s*["\']([^"\']+)["\']/i', $content, $classMatches)) {
+            foreach ($classMatches[1] as $classString) {
+                $classes = preg_split('/\s+/', trim($classString));
+                foreach ($classes as $class) {
+                    $class = strtolower($class);
+                    if (
+                        str_starts_with($class, 'eics-') &&
+                        !str_ends_with($class, 'eics-icon-fonts') &&
+                        !str_starts_with($class, 'wp-block-easy-symbols-icons')
+                    ) {
+                        $icons[] = $class;
+                    }
+                }
             }
         }
 
         return array_values(array_unique($icons));
     }
-
 
     /**
      * Extracts icon class names from the given post.
@@ -396,11 +387,37 @@ class IconHandler {
     }
 
     /**
+     * Updates icon usage for generic objects (menus, widgets, templates).
+     *
+     * @param string $object_type
+     * @param string|int $object_id
+     * @param string $content
+     */
+    public static function update_icon_usage_per_object(
+        string $object_type,
+        string|int $object_id,
+        string $content
+    ): void {
+        $key    = "{$object_type}:{$object_id}";
+
+        $icon_usage = get_option('eics_icon_usage_objects' []);
+        $icons      = self::extract_icons_from_content($content);
+
+        if (empty($icons)) {
+            unset($icon_usage[$key]);
+        } else {
+            $icon_usage[$key] = array_values(array_unique($icons));
+        }
+
+        update_option('eics_icon_usage_objects', $icon_usage, false);
+    }
+
+    /**
      * Retrieves a list of all used icon class names in the content across posts.
      *
      * @return array An array of unique icon class names found in the content (e.g., eics-materialicons__home).
      */
-    public static function update_icon_usage_all(): array {
+    public static function update_icon_usage_all_posts(): array {
         global $wpdb;
 
         $icon_usage = [];
@@ -437,6 +454,70 @@ class IconHandler {
 
         return $icon_usage;
     }
+
+    /**
+     * Updates icon usage for all dynamic objects: menus, templates, template parts, widgets.
+     *
+     * @return array Icon usage by object.
+     */
+    public static function update_icon_usage_all_objects(): array {
+        $usage = [];
+
+        // Menus
+        foreach (wp_get_nav_menus() as $menu) {
+            ob_start();
+            wp_nav_menu(['menu' => $menu->term_id, 'echo' => true, 'fallback_cb' => false]);
+            $icons = self::extract_icons_from_content(ob_get_clean());
+            if (!empty($icons)) $usage["nav_menu:{$menu->term_id}"] = $icons;
+        }
+
+        // FSE templates and template parts
+        $templates = get_posts([
+            'post_type'      => ['wp_template', 'wp_template_part'],
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+        ]);
+        foreach ($templates as $post) {
+            $icons = self::extract_icons_from_content($post->post_content);
+            if (!empty($icons)) $usage["{$post->post_type}:{$post->post_name}"] = $icons;
+        }
+
+        // // Widgets
+        // $sidebars = wp_get_sidebars_widgets();
+        // foreach ($sidebars as $sidebar_id => $widgets) {
+        //     foreach ($widgets as $widget_id) {
+        //         ob_start();
+        //         the_widget(get_widget_class_by_id($widget_id));
+        //         $icons = self::extract_icons_from_content(ob_get_clean());
+        //         if (!empty($icons)) $usage["widget:{$widget_id}"] = $icons;
+        //     }
+        // }
+
+        update_option('eics_icon_usage_objects', $usage, false);
+        return $usage;
+    }
+
+    /**
+     * Updates all icon usage (posts + objects) and returns a unified list.
+     *
+     * @return array Unique icons used across posts and objects.
+     */
+    public static function update_icon_usage_all(): array {
+        $posts   = self::update_icon_usage_all_posts();
+        $objects = self::update_icon_usage_all_objects();
+
+        $icons = array_keys($posts);
+
+        foreach ($objects as $icon_list) {
+            $icons = array_merge($icons, $icon_list);
+        }
+
+        $icons = array_values(array_unique($icons));
+        sort($icons);
+
+        return $icons;
+    }
+
 
     /**
      * Removes all references to a post from the icon usage tracking.
@@ -488,10 +569,19 @@ class IconHandler {
      * @return array An array of unique icon class names found in the content (e.g., eics-materialicons__home).
      */
     public static function get_used_icons(): array {
-        $icon_usage = get_option('eics_icon_usage', []);
+        $post_usage   = get_option('eics_icon_usage', []);
+        $object_usage = get_option('eics_icon_usage_objects', []);
 
-        $icons = array_keys($icon_usage);
+        $icons = array_keys($post_usage);
+
+        foreach ($object_usage as $icon_list) {
+            $icons = array_merge($icons, $icon_list);
+        }
+
+        $icons = array_values(array_unique($icons));
         sort($icons);
+
+        update_option('eics_all_used_icons', $icons, false);
 
         return $icons;
     }
