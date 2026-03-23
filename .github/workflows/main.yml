@@ -24,6 +24,7 @@ jobs:
 
       - name: Remove Development Files
         run: |
+          pwd
           rm -rf ${{ env.pluginSlug }}/.git
           rm -rf ${{ env.pluginSlug }}/.github
           rm -rf ${{ env.pluginSlug }}/.idea
@@ -45,3 +46,4 @@ jobs:
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          BUILD_DIR: .
