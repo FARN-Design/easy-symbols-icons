@@ -7,7 +7,7 @@ jobs:
     name: Release New Version ${{  github.ref_name }}
     runs-on: ubuntu-latest
     env:
-      pluginSlug: 'easysymbolsicons'
+      pluginSlug: 'easy-symbols-icons'
     steps:
       - uses: actions/checkout@v3
       - run: sed -i "s/.*Stable tag.*/Stable tag:\ ${{  github.ref_name }}/" README.txt

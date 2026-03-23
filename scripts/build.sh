@@ -12,7 +12,7 @@ echo "Working directory: $(pwd)"
 
 echo "Installing PHP dependencies (Composer)..."
 if command -v composer >/dev/null 2>&1; then
-    composer install --no-interaction --prefer-dist
+    composer install --no-dev --no-interaction --prefer-dist
 else
     echo "Composer not found. Please install Composer."
     exit 1
