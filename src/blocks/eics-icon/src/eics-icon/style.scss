@@ -1,6 +1,11 @@
 // This is important DO NOT REMOVE
 // If this is removed the wrapper ::before will also show the selected icon
 .selected-icon-wrapper::before {
-    content: none !important;
-    display: none !important;
+	content: none !important;
+	display: none !important;
+}
+
+.selected-icon-span [class*="eics-"]::before {
+	color: inherit !important;
+	fill: currentColor !important;
 }
