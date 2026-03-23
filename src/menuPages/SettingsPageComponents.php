@@ -58,7 +58,7 @@ function eics_displayFontPopup() {
             <h2><?php echo esc_html__("No Icon Fonts Available", "easy-symbols-icons"); ?></h2>
             <p><?php echo esc_html__("No icon fonts are currently installed. You can choose to download a set of default fonts from external sources, or upload your own custom fonts instead.", "easy-symbols-icons"); ?></p>
             <div>
-                <?php echo esc_html__("Note: Default fonts will be downloaded from trusted sources only – JSDelivr CDN and the official WordPress Dashicons GitHub repository.", "easy-symbols-icons"); ?>
+                <?php echo esc_html__("Note: Default fonts will be downloaded from trusted sources only - JSDelivr CDN and the official WordPress Dashicons GitHub repository.", "easy-symbols-icons"); ?>
             </div>
             <button id="download-default-fonts" class="button button-primary">
                 <?php echo esc_html__("Download Default Fonts", "easy-symbols-icons"); ?>
