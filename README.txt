@@ -12,7 +12,7 @@ Upload, manage, and use custom icon fonts in WordPress in a centralized and perf
 
 == Description ==
 
-Easy Symbols & Icons is a plugin for managing and using icon fonts in a centralized and performance-oriented manner. This is achieved through a centralized design to handle fonts instead of leaving each to their own usage format and thereby inducing chaos. Fonts are parsed manually, icon names are extracted, and fonts are subsetted to include only used icons.
+"Easy Symbols & Icons" is a plugin for managing and using icon fonts in a centralized and performance-oriented manner. This is achieved through a centralized design to handle fonts instead of leaving each to their own usage format and thereby inducing chaos. Fonts are parsed manually, icon names are extracted, and fonts are subsetted to include only used icons.
 
 Perfect for developers, designers, and agencies who want a scalable and efficient icon system in WordPress.
 
@@ -39,31 +39,31 @@ Instant availability after upload
 
 == Installation ==
 
-Search for Easy Symbols & Icons
-Activate the plugin through the Plugins menu in WordPress
-Go to Easy Symbols & Icons in the admin menu
-Upload or select your icon fonts
+1. Search for "Easy Symbols & Icons"
+2. Activate the plugin through the Plugins menu in WordPress
+3. Go to "Easy Symbols & Icons Settings" in the admin menu
+4. Upload or select your icon fonts
 
 == Usage ==
 
-Navigate to Easy Symbols & Icons -> Font Select
-Upload .ttf or .otf icon font files
-Enable the fonts you want to use
-Save your changes
+1. Navigate to "Easy Symbols & Icons Settings" -> "Font Select"
+2. Upload .ttf or .otf icon font files
+3. Enable the fonts you want to use
+4. Save your changes
 
 To add icons:
 
-Open the WordPress block editor
-Add the eics-icon block
-Click the block to open the icon picker
-Search or browse icons
-Select an icon and customize styling
+1. Open the WordPress block editor
+2. Add the "Icon" block or use the `[eics-icon]` shortcode
+3. Click the block to open the icon picker
+4. Search or browse icons
+5. Select an icon and customize styling
 
 == Frequently Asked Questions ==
 
 = What makes this plugin different from other icon plugins? =
 
-Easy Symbols & Icons focuses on performance and flexibility:
+"Easy Symbols & Icons" focuses on performance and flexibility:
 
 Uses icon fonts instead of SVG libraries
 Supports dynamic subsetting (only loads used icons)
@@ -88,18 +88,26 @@ No. This plugin focuses on icon fonts (webfonts) as a lightweight and scalable a
 
 == Screenshots ==
 
-1. General
-2. Font Select
-3. Available Icons
+1. Add the Icon Block to the Block Editor with an icon selection and search function
+2. Add the Icon Block to the Block Editor with an icon selection and search function
+3. Customizable colors and sizes
+4. Overview of available icons after uploading icon fonts
+5. Search function within the overview
+6. Settings page for uploading icon fonts
+7. Main settings page
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0.2 =
+* First release to WordPress plugin marketplace
 
-Initial release
+= 1.0.1 =
+* add Dynamic font subsetting for performance
+
+= 1.0.0 =
+* Initial release
 Custom icon font upload and management
 Gutenberg icon block with search and picker
-Dynamic font subsetting for performance
 
 == Upgrade Notice ==
 
