@@ -190,7 +190,17 @@ class IconHandler {
 
             $font_dir = self::$iconsDir . '/' . $folder;
 
-            $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+            $font_files = [];
+
+            if (is_dir($font_dir)) {
+                $files = scandir($font_dir);
+
+                foreach ($files as $file) {
+                    if (preg_match('/\.(ttf|otf)$/i', $file)) {
+                        $font_files[] = $font_dir . '/' . $file;
+                    }
+                }
+            }
 
             if (is_dir($font_dir) && !empty($font_files)) {
                 $fonts[$folder] = $folder;
