@@ -24,7 +24,7 @@
     },
     {
       "step": "runPHP",
-      "code": "<?php if(!defined('GLOB_BRACE')){define('GLOB_BRACE',0);} ?>"
+      "code": "<?php $base='wp-content/uploads'; if(!is_dir($base)){mkdir($base,0777,true);} $dir=$base.'/eics-icons'; if(!is_dir($dir)){mkdir($dir);} $dir2=$dir.'/dashicons'; if(!is_dir($dir2)){mkdir($dir2);} $url='https://s.w.org/wp-includes/fonts/dashicons.ttf'; $data=file_get_contents($url); if($data!==false){file_put_contents($dir2.'/dashicons.ttf',$data);} ?>"
     },
     {
       "step": "login",
