@@ -13,7 +13,8 @@
 		"align": true,
 		"color": {
 			"text": true,
-			"background": true
+			"background": true,
+			"link": true
 		},
 		"typography": {
 			"fontSize": true,

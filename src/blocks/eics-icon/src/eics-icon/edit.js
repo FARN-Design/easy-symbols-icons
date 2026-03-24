@@ -28,7 +28,7 @@ export default function Edit({ attributes, setAttributes }) {
 	iconClass } =
 		attributes;
 	const blockId = useRef(generateRandomHash()).current;
-	const resolvedIconClass = iconClass || className;
+	const resolvedIconClass = iconClass || "";
 
 	const [fonts, setFonts] = useState({});
 	const [loading, setLoading] = useState(true);
@@ -109,8 +109,7 @@ export default function Edit({ attributes, setAttributes }) {
 		const iconName = matches[2];
 
 		setAttributes({
-			iconClass: className, // ✅ new
-			className: undefined, // ✅ clean old (important)
+			iconClass: className,
 			font: fontName,
 			icon: iconName,
 		});
@@ -196,14 +195,15 @@ export default function Edit({ attributes, setAttributes }) {
 			>
 				{resolvedIconClass &&
 				isValidIcon ? (
-					<button
-						className={resolvedIconClass + " eics-select-button-has-icon"}
+					<span
+						className={resolvedIconClass + " eics-icon-span"}
 						style={{
+							display: "inline-block",
 							cursor: "pointer",
 							color: textColor || undefined,
 							backgroundColor: backgroundColor || undefined,
 						}}
-					></button>
+					></span>
 				) : (
 					<button
 						className={
@@ -230,7 +230,7 @@ export default function Edit({ attributes, setAttributes }) {
 					placement="bottom-start"
 					offset={8}
 					onClose={() => setIsPickerOpen(false)}
-				>
+				>‚
 					<div className="eics-icon-grid">
 					<div className="eics-icon-search">
 						<TextControl
