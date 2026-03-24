@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  wordpress:
+    image: wordpress:php8.2-fpm-alpine
+    container_name: eics-wp
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount plugin into WP plugins dir
+      - ./:/var/www/html/wp-content/plugins/easy-symbols-icons
+
+      # Persist WP data
+      - wp_data:/var/www/html
+
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wp
+      WORDPRESS_DB_NAME: wp
+
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: eics-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: wp
+      MYSQL_USER: wp
+      MYSQL_PASSWORD: wp
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+
+  builder:
+    image: node:20
+    container_name: eics-builder
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "chmod +x scripts/build.sh && ./scripts/build.sh"
+
+volumes:
+  db_data:
+  wp_data:

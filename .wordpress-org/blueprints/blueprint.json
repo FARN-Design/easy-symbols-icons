@@ -1,7 +1,7 @@
 {
   "landingPage": "/wp-admin/admin.php?page=eics_settings-page&tab=general",
   "features": {
-    "networking" : true
+    "networking": true
   },
   "preferredVersions": {
     "php": "8.4",
@@ -14,18 +14,22 @@
   "steps": [
     {
       "step": "installPlugin",
-        "pluginData": {
-          "resource": "wordpress.org/plugins",
-          "slug": "easy-symbols-icons"
-        },
-        "options": {
-          "activate": true
-        }
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "easy-symbols-icons"
       },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php if(!defined('GLOB_BRACE')){define('GLOB_BRACE',0);} ?>"
+    },
     {
       "step": "login",
-        "username": "admin",
-        "password": "password"
+      "username": "admin",
+      "password": "password"
     }
   ]
 }

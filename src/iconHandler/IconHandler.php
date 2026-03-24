@@ -135,7 +135,19 @@ class IconHandler {
             return false;
         }
 
-        $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+        $font_files = [];
+
+        foreach (scandir($font_dir) as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $path = $font_dir . DIRECTORY_SEPARATOR . $file;
+
+            if (is_file($path) && preg_match('/\.(ttf|otf)$/i', $file)) {
+                $font_files[] = $path;
+            }
+        }
 
         foreach ($font_files as $file) {
             if (file_exists($file)) {
@@ -190,7 +202,17 @@ class IconHandler {
 
             $font_dir = self::$iconsDir . '/' . $folder;
 
-            $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+            $font_files = [];
+
+            if (is_dir($font_dir)) {
+                $files = scandir($font_dir);
+
+                foreach ($files as $file) {
+                    if (preg_match('/\.(ttf|otf)$/i', $file)) {
+                        $font_files[] = $font_dir . '/' . $file;
+                    }
+                }
+            }
 
             if (is_dir($font_dir) && !empty($font_files)) {
                 $fonts[$folder] = $folder;
