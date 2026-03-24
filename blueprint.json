@@ -1,31 +1,35 @@
 {
-  "landingPage": "/wp-admin/",
-  "preferredVersions": {
-    "php": "8.3"
+  "landingPage": "/wp-admin/admin.php?page=eics_settings-page&tab=general",
+  "features": {
+    "networking": true
   },
+  "preferredVersions": {
+    "php": "8.4",
+    "wp": "latest"
+  },
+  "phpExtensionBundles": [
+    "kitchen-sink"
+  ],
+  "login": true,
   "steps": [
-    
-    {
-      "step": "defineWpConfigConsts",
-      "consts": {
-        "WP_DEBUG": true
-      }
-    },
     {
       "step": "installPlugin",
       "pluginData": {
-        "resource": "local",
-        "path": "."
+        "resource": "wordpress.org/plugins",
+        "slug": "easy-symbols-icons"
+      },
+      "options": {
+        "activate": true
       }
     },
     {
-      "step": "activatePlugin",
-      "pluginPath": "easy-symbols-icons/easy-symbols-icons.php"
+      "step": "runPHP",
+      "code": "<?php $base='wp-content/uploads'; if(!is_dir($base)){mkdir($base,0777,true);} $dir=$base.'/eics-icons'; if(!is_dir($dir)){mkdir($dir);} $dir2=$dir.'/dashicons'; if(!is_dir($dir2)){mkdir($dir2);} $url='https://s.w.org/wp-includes/fonts/dashicons.ttf'; $data=file_get_contents($url); if($data!==false){file_put_contents($dir2.'/dashicons.ttf',$data);} ?>"
     },
     {
-      "step": "wp-cli",
-      "command": "wp post create --post_title='Test post' --post_content='Some content' --post_status=publish"
-    },
+      "step": "runPHP",
+      "code": "<?php require_once '/wordpress/wp-load.php'; global $wpdb; $table = $wpdb->prefix . 'eics_Settings'; $wpdb->replace($table, ['Setting' => 'loaded_fonts', 'Value' => '[\"dashicons\"]']); if ($wpdb->last_error) { echo $wpdb->last_error; } ?>"
+    },    
     {
       "step": "login",
       "username": "admin",
