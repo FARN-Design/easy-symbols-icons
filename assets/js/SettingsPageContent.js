@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const alphaNavs = document.querySelectorAll(".eics-alpha-nav");
-            const alphaHeader = document.querySelectorAll(".eics-alpha-header");
+            const alphaHeader = document.querySelectorAll(".eics-alpha-header-wrapper");
             if (query.length > 0) {
                 alphaNavs.forEach((nav) => (nav.style.display = "none"));
                 alphaHeader.forEach((a) => (a.style.display = "none"));
@@ -172,8 +172,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
                 if (visibleIcons.length > 0) {
                     alphaGroup.style.display = "flex";
+                    alphaGroup.style.margin = "3rem 0 0 0";
                 } else {
                     alphaGroup.style.display = "none";
+                    alphaGroup.style.margin = "0";
                 }
             });
         });
