@@ -135,7 +135,19 @@ class IconHandler {
             return false;
         }
 
-        $font_files = glob($font_dir . '/*.{ttf,otf}', GLOB_BRACE);
+        $font_files = [];
+
+        foreach (scandir($font_dir) as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $path = $font_dir . DIRECTORY_SEPARATOR . $file;
+
+            if (is_file($path) && preg_match('/\.(ttf|otf)$/i', $file)) {
+                $font_files[] = $path;
+            }
+        }
 
         foreach ($font_files as $file) {
             if (file_exists($file)) {
