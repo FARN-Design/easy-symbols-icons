@@ -1,3 +1,5 @@
+import apiFetch from '@wordpress/api-fetch';
+
 const STORE_KEY = "__EICS_FONTS_STORE__";
 
 function getGlobalStore() {
@@ -21,29 +23,17 @@ export function getFonts() {
 		return store.promise;
 	}
 
-	store.promise = (async () => {
-		let response = await fetch("/wp-json/easysymbolsicons/v1/loaded-fonts");
-
-		if (!response.ok) {
-			response = await fetch("/?rest_route=/easysymbolsicons/v1/loaded-fonts");
-		}
-
-		if (!response.ok) {
-			throw new Error(`HTTP error ${response.status}`);
-		}
-
-		const text = await response.text();
-
-		let json;
-		try {
-			json = JSON.parse(text);
-		} catch {
-			json = [];
-		}
-
-		store.cache = json;
-		return json;
-	})();
+	store.promise = apiFetch({
+		path: '/easysymbolsicons/v1/loaded-fonts',
+	})
+		.then((json) => {
+			store.cache = json;
+			return json;
+		})
+		.catch((error) => {
+			store.promise = null;
+			throw error;
+		});
 
 	return store.promise;
 }
