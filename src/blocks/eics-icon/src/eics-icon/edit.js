@@ -1,9 +1,20 @@
-import { useState, useEffect } from "@wordpress/element";
-import { TextControl, PanelBody, PanelRow } from "@wordpress/components";
+import { useState, useEffect, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
-import { BlockControls, AlignmentToolbar, InspectorControls } from "@wordpress/block-editor";
-import { useBlockProps } from "@wordpress/block-editor";
-import "./editor.scss";
+import {
+	BlockControls,
+	AlignmentToolbar,
+	InspectorControls,
+	useBlockProps,
+} from "@wordpress/block-editor";
+import {
+	ToolbarGroup,
+	ToolbarButton,
+	TextControl,
+	PanelBody,
+	PanelRow,
+	Popover,
+} from "@wordpress/components";import "./editor.scss";
+import { getFonts } from "./utils/fontsStore";
 
 function generateRandomHash() {
 	return (
@@ -13,46 +24,35 @@ function generateRandomHash() {
 }
 
 export default function Edit({ attributes, setAttributes }) {
-	const { fontSize, lineHeight, align, backgroundColor, textColor, className } =
+	const { fontSize, lineHeight, align, backgroundColor, textColor, className,
+	iconClass } =
 		attributes;
-	const blockId = generateRandomHash();
+	const blockId = useRef(generateRandomHash()).current;
+	const resolvedIconClass = iconClass || "";
 
 	const [fonts, setFonts] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [searchTerm, setSearchTerm] = useState("");
-
-	const [selectedIcon, setSelectedIcon] = useState({ className });
+	const [isPickerOpen, setIsPickerOpen] = useState(false);
+	const [selectedIcon, setSelectedIcon] = useState(() =>
+		resolvedIconClass ? { className: resolvedIconClass } : {}
+	);
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				let response = await fetch("/wp-json/easysymbolsicons/v1/loaded-fonts");
+		let mounted = true;
 
-				if (!response.ok) {
-					response = await fetch("/?rest_route=/easysymbolsicons/v1/loaded-fonts");
-				}
-
-				if (!response.ok) {
-					throw new Error(`HTTP error ${response.status}`);
-				}
-
-				const text = await response.text();
-				let json;
-
-				try {
-					json = JSON.parse(text);
-				} catch {
-					json = [];
-				}
+		getFonts()
+			.then((json) => {
+				if (!mounted) return;
 
 				if (Array.isArray(json) && json.length === 0) {
 					setError(
 						<span>
-							No fonts found. Please visit the{' '}
+							No fonts found. Please visit the{" "}
 							<a href="/wp-admin/admin.php?page=eics_settings-page&tab=fontselect">
 								font selection page
-							</a>{' '}
+							</a>{" "}
 							to add fonts.
 						</span>
 					);
@@ -63,14 +63,17 @@ export default function Edit({ attributes, setAttributes }) {
 				}
 
 				setLoading(false);
-			} catch (error) {
+			})
+			.catch((error) => {
+				if (!mounted) return;
 				setError("Failed to fetch fonts");
 				setLoading(false);
 				console.error(error);
-			}
-		};
+			});
 
-		fetchData();
+			return () => {
+				mounted = false;
+			};
 	}, []);
 
 	const filteredFonts = Object.keys(fonts)
@@ -90,10 +93,6 @@ export default function Edit({ attributes, setAttributes }) {
 		})
 		.filter((font) => font.glyphs.length > 0);
 
-	const handleTypographyChange = (value, property) => {
-		setAttributes({ [property]: value });
-	};
-
 	const handleAlignmentChange = (newAlign) => {
 		setAttributes({ align: newAlign });
 	};
@@ -110,25 +109,22 @@ export default function Edit({ attributes, setAttributes }) {
 		const iconName = matches[2];
 
 		setAttributes({
-			className,
+			iconClass: className,
 			font: fontName,
 			icon: iconName,
 		});
 
 		setSelectedIcon({ className, font: fontName, icon: iconName });
+		setIsPickerOpen(false);
 	};
 
 	const blockProps = useBlockProps({
+		className: `selected-icon-wrapper ${align ? `align${align}` : ""}`,
 		style: {
 			fontSize: fontSize ? `${fontSize}px` : undefined,
 			lineHeight: lineHeight ? `${lineHeight}px` : undefined,
-			backgroundColor: backgroundColor || undefined,
-			color: textColor || undefined,
 		},
 	});
-
-	const wrapperClass = `selected-icon-wrapper align${align}`;
-	const selectorID = `eics-icon-grid-${blockId}`;
 
 	const isIconValid = (iconClassName, loadedFonts) => {
 		for (const fontFolder in loadedFonts) {
@@ -143,20 +139,31 @@ export default function Edit({ attributes, setAttributes }) {
 		return false;
 	};
 
+	const isValidIcon =
+		resolvedIconClass &&
+		(loading || isIconValid(resolvedIconClass, fonts));
+
 	return (
 		<>
 			<BlockControls>
-				<AlignmentToolbar value={align} onChange={handleAlignmentChange} />
+				<AlignmentToolbar value={align ? `align${align}` : ""} onChange={handleAlignmentChange} />
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={() => setIsPickerOpen((prev) => !prev)}
+					>
+						{__("Replace icon", "easy-symbols-icons")}
+					</ToolbarButton>
+				</ToolbarGroup>
 			</BlockControls>
 
 			<InspectorControls>
 				<PanelBody title={__("Selected Icon", "easy-symbols-icons")} initialOpen={true}>
 					<PanelRow>
-						{selectedIcon.className ? (
+						{resolvedIconClass ? (
 							<>
 								<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 									<span
-										className={selectedIcon.className}
+										className={resolvedIconClass}
 										style={{ fontSize: "24px" }}
 									></span>
 
@@ -171,7 +178,7 @@ export default function Edit({ attributes, setAttributes }) {
 										</p>
 										<p>
 											<strong>{__("Class:", "easy-symbols-icons")}</strong>{" "}
-											{selectedIcon.className}
+											{resolvedIconClass}
 										</p>
 									</div>
 								</div>
@@ -185,24 +192,46 @@ export default function Edit({ attributes, setAttributes }) {
 
 			<div
 				{...blockProps}
-				className={`${blockProps.className} ${wrapperClass}`}
 			>
-				{selectedIcon.className &&
-				isIconValid(selectedIcon.className, fonts) ? (
-					<button
-						className={selectedIcon.className + " eics-select-button-has-icon"}
-						style={{ cursor: "pointer" }}
-						popovertarget={selectorID}
-					></button>
+				{resolvedIconClass &&
+				isValidIcon ? (
+					<span
+						className={resolvedIconClass + " eics-icon-span"}
+						style={{
+							display: "inline-block",
+							cursor: "pointer",
+							color: textColor || undefined,
+							backgroundColor: backgroundColor || undefined,
+						}}
+					></span>
 				) : (
-					<button className="eics-select-button" popovertarget={selectorID}>
-						{__("add icon", "easy-symbols-icons")}
+					<button
+						className={
+							resolvedIconClass
+								? resolvedIconClass + " eics-select-button-has-icon"
+								: "eics-select-button"
+						}
+						style={{
+							cursor: "pointer",
+							color: textColor || undefined,
+							backgroundColor: backgroundColor || undefined,
+						}}
+						onClick={() => setIsPickerOpen((prev) => !prev)}
+					>
+						{isValidIcon
+							? __("replace icon", "easy-symbols-icons")
+							: __("add icon", "easy-symbols-icons")}
 					</button>
 				)}
 			</div>
 
-			{
-				<div className="eics-icon-grid" id={selectorID} popover="auto">
+			{isPickerOpen && (
+				<Popover
+					placement="bottom-start"
+					offset={8}
+					onClose={() => setIsPickerOpen(false)}
+				>‚
+					<div className="eics-icon-grid">
 					<div className="eics-icon-search">
 						<TextControl
 							value={searchTerm}
@@ -236,7 +265,7 @@ export default function Edit({ attributes, setAttributes }) {
 												<span
 													key={i}
 													className="eics-font-icon"
-													onClick={() => handleIconClick(iconClass)} // Select icon on click
+													onClick={() => handleIconClick(iconClass)}
 													style={{
 														cursor: "pointer",
 														fontSize: "20px",
@@ -256,7 +285,8 @@ export default function Edit({ attributes, setAttributes }) {
 						<p>{__("No fonts found", "easy-symbols-icons")}</p>
 					)}
 				</div>
-			}
+			</Popover>
+		)}
 		</>
 	);
 }

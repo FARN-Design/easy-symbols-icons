@@ -120,7 +120,7 @@ class IconFontSubsetter {
         if (preg_match('/^(?:0x)?([0-9A-Fa-f]+)$/i', $unicode, $m)) return hexdec($m[1]);
         // Match literal \uXXXX in the string
         if (preg_match('/^\\\\u([0-9A-Fa-f]{4})$/i', $unicode, $m)) return hexdec($m[1]);
-        // Match literal \XXXX (CSS-style, 1–6 digits)
+        // Match literal \XXXX (CSS-style, 1-6 digits)
         if (preg_match('/^\\\\([0-9A-Fa-f]{1,6})$/i', $unicode, $m)) {
             // Pad to at least 4 digits internally
             $hex = str_pad($m[1], 4, '0', STR_PAD_LEFT);

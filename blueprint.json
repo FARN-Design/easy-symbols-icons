@@ -1,5 +1,10 @@
 {
+  "landingPage": "/wp-admin/",
+  "preferredVersions": {
+    "php": "8.3"
+  },
   "steps": [
+    
     {
       "step": "defineWpConfigConsts",
       "consts": {
@@ -7,16 +12,24 @@
       }
     },
     {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "local",
+        "path": "."
+      }
+    },
+    {
       "step": "activatePlugin",
-      "pluginPath": "/wordpress/wp-content/plugins/easysymbolsicons/easysymbolsicons.php"
+      "pluginPath": "easy-symbols-icons/easy-symbols-icons.php"
     },
     {
       "step": "wp-cli",
-      "command": "wp post create --post_title='Test post' --post_excerpt='Some content'"
+      "command": "wp post create --post_title='Test post' --post_content='Some content' --post_status=publish"
     },
     {
       "step": "login",
-      "username": "admin"
+      "username": "admin",
+      "password": "password"
     }
   ]
 }

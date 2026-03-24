@@ -5,6 +5,19 @@
 -   WordPress 6.0 or higher
 -   PHP 8.0 or higher
 
+## Build Instructions
+
+To build the plugin run:
+```
+git clone https://github.com/FARN-Design/easy-symbols-icons
+cd easy-symbols-icons
+
+chmod +x scripts/build.sh
+./scripts/build.sh
+```
+
+Then zip the project and upload to wordpress
+
 ## Usage
 
 1. **Settings Page**
