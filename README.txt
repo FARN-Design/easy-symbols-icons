@@ -1,21 +1,20 @@
 === Easy Symbols & Icons ===
 Contributors: farndesign
-Tags: icons, icon fonts, dynamic subsetting, performance, font management, webfonts, easy-symbols-icons
+Tags: font management, icon fonts, icons, webfonts, performance
 Requires at least: 6.2
 Tested up to: 6.9
-Stable tag: 1.0.0
+Stable tag: 1.1.4
 Requires PHP: 8.2
 License: GPLv3 or later
-License URI: [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)
+License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
 Upload, manage, and use custom icon fonts in WordPress in a centralized and performance-oriented way. Add icons via Gutenberg block or shortcode, with performance-optimized centralized font management and dynamic subsetting for minimal loading times supported.
 
 == Description ==
 
-"Easy Symbols & Icons" is a plugin for managing and using icon fonts in a centralized and performance-oriented manner. This is achieved through a centralized design to handle fonts instead of leaving each to their own usage format and thereby inducing chaos. Fonts are parsed manually, icon names are extracted, and fonts are subsetted to include only used icons.
+"Easy Symbols & Icons" is a plugin for managing and using icon fonts in a centralized and performance-oriented manner. This is achieved through a centralized design to handle fonts instead of leaving each to their own usage format, thereby introducing chaos. Fonts are parsed, icon names are extracted, and fonts are subsetted to include only used icons.
 
 Perfect for developers, designers, and agencies who want a scalable and efficient icon system in WordPress.
-
 == Key Advantages ==
 
 Dynamic font subsetting - only loads the icons used on the page
