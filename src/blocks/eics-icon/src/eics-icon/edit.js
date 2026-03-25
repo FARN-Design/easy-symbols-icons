@@ -230,6 +230,7 @@ export default function Edit({ attributes, setAttributes }) {
 					placement="bottom-start"
 					offset={8}
 					onClose={() => setIsPickerOpen(false)}
+					className="eics-popover"
 				>‚
 					<div className="eics-icon-grid">
 					<div className="eics-icon-search">
