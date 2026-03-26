@@ -19,6 +19,7 @@ if ( isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' 
         echo wp_kses_post($eics_save_result['notice']);
     }
     eics_handleRefreshIconUsage();
+    eics_handleManualIconsSave();
 }
 ?>
 
@@ -94,6 +95,43 @@ function eics_displayGeneralTab() { ?>
             "easy-symbols-icons"
         ); ?>
     </p>
+
+    <hr>
+
+    <h2><?php esc_html_e("Manually Include Icons", "easy-symbols-icons"); ?></h2>
+
+    <p class="description">
+        <?php esc_html_e(
+            'Enter icons separated by commas. Format: font__icon (e.g. materialicons__home). Prefix "eics-" is optional.',
+            'easy-symbols-icons'
+        ); ?>
+    </p>
+
+    <?php
+    $manual_icons_raw = get_option('eics_manual_used_icons', []);
+
+    if (is_string($manual_icons_raw)) {
+        $manual_icons = json_decode($manual_icons_raw, true) ?? [];
+    } elseif (is_array($manual_icons_raw)) {
+        $manual_icons = $manual_icons_raw;
+    } else {
+        $manual_icons = [];
+    }    ?>
+
+    <form method="post">
+        <?php wp_nonce_field('save_manual_icons', 'save_manual_icons_nonce'); ?>
+
+        <textarea
+            name="eics_manual_used_icons"
+            rows="6"
+            style="width:100%;"
+            placeholder="eics-materialicons__home&#10;materialicons__search"
+        ><?php echo esc_textarea(implode("\n", $manual_icons)); ?></textarea>
+
+        <br><br>
+
+        <input type="submit" class="button button-primary" value="<?php esc_attr_e("Save Manual Icons", "easy-symbols-icons"); ?>">
+    </form>
 
     <hr>
     
