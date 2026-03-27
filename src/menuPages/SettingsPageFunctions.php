@@ -130,8 +130,16 @@ function eics_handleManualIconsSave() {
                 $icon = substr($icon, 5);
             }
 
-            if (preg_match('/^[a-z0-9\-]+__[a-z0-9\-]+$/', $icon)) {
-                $valid_icons[] = $icon;
+            if (preg_match('/^(eics-)?[a-z0-9_-]+__[a-z0-9_-]+$/', $icon)) {
+                $normalized = str_starts_with($icon, 'eics-') ? substr($icon, 5) : $icon;
+
+                // Ensure exactly ONE "__"
+                if (substr_count($normalized, '__') === 1) {
+                    $valid_icons[] = $normalized;
+                } else {
+                    $invalid_icons[] = $icon;
+                }
+
             } else {
                 $invalid_icons[] = $icon;
             }

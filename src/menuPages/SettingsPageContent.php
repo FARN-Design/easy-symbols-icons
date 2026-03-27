@@ -98,11 +98,11 @@ function eics_displayGeneralTab() { ?>
 
     <hr>
 
-    <h2><?php esc_html_e("Manually Include Icons", "easy-symbols-icons"); ?></h2>
+    <h2><?php esc_html_e("Manual Used Icons Override", "easy-symbols-icons"); ?></h2>
 
     <p class="description">
         <?php esc_html_e(
-            'Enter icons separated by commas. Format: font__icon (e.g. materialicons__home). Prefix "eics-" is optional.',
+            'Enter icons separated by new lines or commas. Add to the list of icons that will be loaded. Format: font__icon (e.g. materialicons__home). Prefix "eics-" is optional.',
             'easy-symbols-icons'
         ); ?>
     </p>
