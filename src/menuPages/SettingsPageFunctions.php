@@ -100,6 +100,63 @@ function eics_handleFontSelectionSave() {
 }
 
 /**
+ * Handles saving manually included icons.
+ */
+function eics_handleManualIconsSave() {
+    if (
+        isset($_POST['save_manual_icons_nonce']) &&
+        wp_verify_nonce(
+            sanitize_text_field(wp_unslash($_POST['save_manual_icons_nonce'])),
+            'save_manual_icons'
+        )
+    ) {
+        $raw = isset($_POST['eics_manual_used_icons'])
+            ? sanitize_textarea_field(wp_unslash($_POST['eics_manual_used_icons']))
+            : '';
+
+        $valid_icons = [];
+        $invalid_icons = [];
+
+        $entries = preg_split('/[\n,]+/', $raw);
+
+        foreach ($entries as $icon) {
+            $icon = strtolower(trim($icon));
+
+            if ($icon === '') {
+                continue;
+            }
+
+            if (str_starts_with($icon, 'eics-')) {
+                $icon = substr($icon, 5);
+            }
+
+            if (preg_match('/^[a-z0-9\-]+__[a-z0-9\-]+$/', $icon)) {
+                $valid_icons[] = $icon;
+            } else {
+                $invalid_icons[] = $icon;
+            }
+        }
+
+        $valid_icons = array_values(array_unique($valid_icons));
+
+        update_option('eics_manual_used_icons', $valid_icons, false);
+
+        echo '<div class="updated notice"><p>' .
+            esc_html__('Manual icons saved. (You may need to Refresh All Used Icons for changes to take effect)', 'easy-symbols-icons') .
+        '</p></div>';
+
+        if (!empty($invalid_icons)) {
+            echo '<div class="notice notice-warning"><p>' .
+                esc_html__('Some entries were ignored due to invalid format:', 'easy-symbols-icons') .
+                '<br><code>' . esc_html(implode(', ', $invalid_icons)) . '</code>' .
+                '<br>' .
+                esc_html__('Expected format: font__icon or eics-font__icon', 'easy-symbols-icons') .
+            '</p></div>';
+        }
+    }
+}
+
+/**
  * Refresh all used icons / font usage.
  */
 function eics_handleRefreshIconUsage() {
