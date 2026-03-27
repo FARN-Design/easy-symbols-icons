@@ -136,6 +136,12 @@ function eics_displayGeneralTab() { ?>
     <hr>
     
     <h2><?php esc_html_e("Refresh Icon Usage", "easy-symbols-icons"); ?></h2>
+    <p class="description">
+        <?php esc_html_e(
+            'Refreshes all used icons by re-scanning all content. This may freeze or be slow on large sites, so use only if necessary',
+            'easy-symbols-icons'
+        ); ?>
+    </p>
     <form method="post">
         <?php wp_nonce_field('refresh_easysymbolsicons_icons', 'refresh_icons_nonce'); ?>
         <input type="submit" class="button button-secondary" value="<?php esc_attr_e("Refresh All Used Icons", "easy-symbols-icons"); ?>">

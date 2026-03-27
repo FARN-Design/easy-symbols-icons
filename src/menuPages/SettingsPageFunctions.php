@@ -142,7 +142,7 @@ function eics_handleManualIconsSave() {
         update_option('eics_manual_used_icons', $valid_icons, false);
 
         echo '<div class="updated notice"><p>' .
-            esc_html__('Manual icons saved.', 'easy-symbols-icons') .
+            esc_html__('Manual icons saved. (You may need to Refresh All Used Icons for changes to take effect)', 'easy-symbols-icons') .
         '</p></div>';
 
         if (!empty($invalid_icons)) {
