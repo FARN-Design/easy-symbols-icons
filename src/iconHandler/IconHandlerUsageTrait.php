@@ -10,10 +10,14 @@ trait IconHandlerUsageTrait {
      * 
      * @return array An array of unique icon class names found in the content.
      */
-    private static function extract_icons_from_content(string $content): array {
+    private static function extract_icons_from_content(string $content, bool $is_plugin_activation = false): array {
         if ($content === '') {
             return [];
         }
+
+		if ($is_plugin_activation){
+			return [];
+		}
 
         // render content with shortcodes, blocks and filters
         $content = apply_filters( 'the_content', $content );
@@ -133,7 +137,7 @@ trait IconHandlerUsageTrait {
      *
      * @return array An array of unique icon class names found in the content (e.g., eics-materialicons__home).
      */
-    public static function update_icon_usage_all_posts(): array {
+    public static function update_icon_usage_all_posts(bool $is_plugin_activation = false): array {
         global $wpdb;
 
         $icon_usage = [];
@@ -147,7 +151,7 @@ trait IconHandlerUsageTrait {
         ");
 
         foreach ($posts as $post) {
-            $icons = self::extract_icons_from_content($post->post_content);
+            $icons = self::extract_icons_from_content($post->post_content, $is_plugin_activation);
 
             foreach ($icons as $icon) {
                 if (!isset($icon_usage[$icon])) {
@@ -176,14 +180,14 @@ trait IconHandlerUsageTrait {
      *
      * @return array Icon usage by object.
      */
-    public static function update_icon_usage_all_objects(): array {
+    public static function update_icon_usage_all_objects(bool $is_plugin_activation = false): array {
         $usage = [];
 
         // Menus
         foreach (wp_get_nav_menus() as $menu) {
             ob_start();
             wp_nav_menu(['menu' => $menu->term_id, 'echo' => true, 'fallback_cb' => false]);
-            $icons = self::extract_icons_from_content(ob_get_clean());
+            $icons = self::extract_icons_from_content(ob_get_clean(), $is_plugin_activation);
             if (!empty($icons)) $usage["nav_menu:{$menu->term_id}"] = $icons;
         }
 
@@ -194,7 +198,7 @@ trait IconHandlerUsageTrait {
             'posts_per_page' => -1,
         ]);
         foreach ($templates as $post) {
-            $icons = self::extract_icons_from_content($post->post_content);
+            $icons = self::extract_icons_from_content($post->post_content, $is_plugin_activation);
             if (!empty($icons)) $usage["{$post->post_type}:{$post->post_name}"] = $icons;
         }
 
@@ -218,9 +222,9 @@ trait IconHandlerUsageTrait {
      *
      * @return array Unique icons used across posts and objects.
      */
-    public static function update_icon_usage_all(): array {
-        $posts   = self::update_icon_usage_all_posts();
-        $objects = self::update_icon_usage_all_objects();
+    public static function update_icon_usage_all(bool $is_plugin_activation = false): array {
+        $posts   = self::update_icon_usage_all_posts($is_plugin_activation);
+        $objects = self::update_icon_usage_all_objects($is_plugin_activation);
 
         $icons = array_keys($posts);
 

@@ -120,7 +120,7 @@ class EasySymbolsIcons
     }
 
     public static function pluginActivation(): void {
-        IconHandler::update_icon_usage_all();
+        IconHandler::update_icon_usage_all(true);
     }
 
     public static function pluginDeactivation(): void {
