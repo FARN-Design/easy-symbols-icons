@@ -35,6 +35,8 @@ jobs:
           rm -rf ./scripts
           rm -rf ./package*
           rm -rf ./composer*
+          rm -rf ./vendor/phenx/php-font-lib/.git
+          rm -rf ./vendor/phenx/php-font-lib/.github
 
       - name: Verify final plugin contents
         run: |
