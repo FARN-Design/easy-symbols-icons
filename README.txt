@@ -2,7 +2,7 @@
 Contributors: farndesign
 Tags: font management, icon fonts, icons, webfonts, performance
 Requires at least: 6.2
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 1.1.4
 Requires PHP: 8.2
 License: GPLv3 or later
