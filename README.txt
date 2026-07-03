@@ -15,6 +15,11 @@ Upload, manage, and use custom icon fonts in WordPress in a centralized and perf
 "Easy Symbols & Icons" is a plugin for managing and using icon fonts in a centralized and performance-oriented manner. This is achieved through a centralized design to handle fonts instead of leaving each to their own usage format, thereby introducing chaos. Fonts are parsed, icon names are extracted, and fonts are subsetted to include only used icons.
 
 Perfect for developers, designers, and agencies who want a scalable and efficient icon system in WordPress.
+
+[Demo Video](https://www.youtube.com/watch?v=ZtSbBOXj1f0)
+
+[youtube https://www.youtube.com/watch?v=ZtSbBOXj1f0]
+
 == Key Advantages ==
 
 Dynamic font subsetting - only loads the icons used on the page
