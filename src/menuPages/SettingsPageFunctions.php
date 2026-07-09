@@ -165,6 +165,63 @@ function eics_handleManualIconsSave() {
 }
 
 /**
+ * Regenerates frontend.css and backend.css.
+ */
+function eics_handleRegenerateCss() {
+    if (
+        isset($_SERVER['REQUEST_METHOD'], $_POST['regenerate_css_nonce']) &&
+        $_SERVER['REQUEST_METHOD'] === 'POST'
+    ) {
+        $nonce = sanitize_text_field(wp_unslash($_POST['regenerate_css_nonce']));
+
+        if (!wp_verify_nonce($nonce, 'regenerate_easysymbolsicons_css')) {
+            return;
+        }
+
+        delete_option('eics_prev_used_icons');
+        delete_option('eics_prev_loaded_fonts');
+
+        IconHandler::initializeIcons();
+
+        echo '<div class="updated notice"><p>' .
+            esc_html__('Icon CSS regenerated successfully.', 'easy-symbols-icons') .
+        '</p></div>';
+    }
+}
+
+/**
+ * Resets plugin settings while preserving uploaded fonts.
+ */
+function eics_handleResetPluginSettings() {
+    if (
+        isset($_SERVER['REQUEST_METHOD'], $_POST['reset_plugin_settings_nonce']) &&
+        $_SERVER['REQUEST_METHOD'] === 'POST'
+    ) {
+        $nonce = sanitize_text_field(wp_unslash($_POST['reset_plugin_settings_nonce']));
+
+        if (!wp_verify_nonce($nonce, 'reset_easysymbolsicons_settings')) {
+            return;
+        }
+
+        Settings::saveSettingInDB('loaded_fonts', wp_json_encode([]));
+
+        delete_option('eics_disable_dynamic_subsetting');
+        delete_option('eics_manual_used_icons');
+        delete_option('eics_prev_used_icons');
+        delete_option('eics_prev_loaded_fonts');
+        delete_option('eics_icon_usage');
+        delete_option('eics_icon_usage_objects');
+        delete_option('eics_all_used_icons');
+
+        IconHandler::initializeIcons();
+
+        echo '<div class="updated notice"><p>' .
+            esc_html__('Plugin settings have been reset.', 'easy-symbols-icons') .
+        '</p></div>';
+    }
+}
+
+/**
  * Refresh all used icons / font usage.
  */
 function eics_handleRefreshIconUsage() {
@@ -172,6 +229,9 @@ function eics_handleRefreshIconUsage() {
         $nonce = sanitize_text_field(wp_unslash($_POST['refresh_icons_nonce']));
         if (wp_verify_nonce($nonce, 'refresh_easysymbolsicons_icons')) {
             IconHandler::update_icon_usage_all();
+            delete_option('eics_prev_used_icons');
+            delete_option('eics_prev_loaded_fonts');
+            IconHandler::initializeIcons();
             echo '<div class="updated notice"><p>' . esc_html__('Icon usage refreshed.', 'easy-symbols-icons') . '</p></div>';
         }
     }
