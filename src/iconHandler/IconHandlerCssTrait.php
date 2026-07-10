@@ -11,7 +11,7 @@ trait IconHandlerCssTrait {
      *
      * @return void
      */
-    private static function generateUnifiedFontCSS(): void {
+    public static function generateUnifiedFontCSS(): void {
         $enabled_fonts = array_map('strtolower', self::getLoadedFonts()); // normalize loaded fonts
         if (empty($enabled_fonts)) {
             update_option('eics_prev_used_icons', self::get_used_icons(), false);

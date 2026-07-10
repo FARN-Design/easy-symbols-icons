@@ -134,18 +134,99 @@ function eics_displayGeneralTab() { ?>
     </form>
 
     <hr>
-    
-    <h2><?php esc_html_e("Refresh Icon Usage", "easy-symbols-icons"); ?></h2>
-    <p class="description">
-        <?php esc_html_e(
-            'Refreshes all used icons by re-scanning all content. This may freeze or be slow on large sites, so use only if necessary',
-            'easy-symbols-icons'
-        ); ?>
-    </p>
-    <form method="post">
-        <?php wp_nonce_field('refresh_easysymbolsicons_icons', 'refresh_icons_nonce'); ?>
-        <input type="submit" class="button button-secondary" value="<?php esc_attr_e("Refresh All Used Icons", "easy-symbols-icons"); ?>">
-    </form>
+
+    <details class="eics-maintenance-tools">
+        <summary>
+            <strong><?php esc_html_e('Maintenance', 'easy-symbols-icons'); ?></strong>
+        </summary>
+
+        <p class="description" style="margin-top:1em;">
+            <?php esc_html_e(
+                'Use these tools to rebuild caches or restore the plugin to its default state.',
+                'easy-symbols-icons'
+            ); ?>
+        </p>
+
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e("Regenerate CSS", "easy-symbols-icons"); ?>
+                    </th>
+                    <td>
+                        <p class="description">
+                            <?php esc_html_e(
+                                'Rebuilds the frontend and backend CSS files from the currently loaded fonts.',
+                                'easy-symbols-icons'
+                            ); ?>
+                        </p>
+
+                        <form method="post">
+                            <?php wp_nonce_field('regenerate_easysymbolsicons_css', 'regenerate_css_nonce'); ?>
+                            <input
+                                type="submit"
+                                class="button button-secondary"
+                                value="<?php esc_attr_e('Regenerate CSS', 'easy-symbols-icons'); ?>"
+                            >
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e("Refresh All Used Icons", "easy-symbols-icons"); ?>
+                    </th>
+                    <td>
+                        <p class="description">
+                            <?php esc_html_e(
+                                'Re-scans all posts, menus and templates to rebuild the icon usage cache. This may take some time on large sites.',
+                                'easy-symbols-icons'
+                            ); ?>
+                        </p>
+
+                        <form
+                            method="post"
+                            onsubmit="return confirm('<?php echo esc_js(__('This will scan all content and may take a while. Continue?', 'easy-symbols-icons')); ?>');"
+                        >
+                            <?php wp_nonce_field('refresh_easysymbolsicons_icons', 'refresh_icons_nonce'); ?>
+                            <input
+                                type="submit"
+                                class="button button-secondary"
+                                value="<?php esc_attr_e('Refresh All Used Icons', 'easy-symbols-icons'); ?>"
+                            >
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e("Reset Plugin Settings", "easy-symbols-icons"); ?>
+                    </th>
+                    <td>
+                        <p class="description">
+                            <?php esc_html_e(
+                                'Resets all plugin settings to their defaults. Uploaded fonts will not be deleted.',
+                                'easy-symbols-icons'
+                            ); ?>
+                        </p>
+
+                        <form
+                            method="post"
+                            onsubmit="return confirm('<?php echo esc_js(__('This will reset all Easy Symbols & Icons settings. Uploaded fonts will NOT be removed. Continue?', 'easy-symbols-icons')); ?>');"
+                        >
+                            <?php wp_nonce_field('reset_easysymbolsicons_settings', 'reset_plugin_settings_nonce'); ?>
+                            <input
+                                type="submit"
+                                class="button button-secondary"
+                                value="<?php esc_attr_e('Reset Plugin Settings', 'easy-symbols-icons'); ?>"
+                            >
+                        </form>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </details>
 <?php }
 
 /* -------------------------------
