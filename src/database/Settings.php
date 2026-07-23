@@ -32,7 +32,7 @@ class Settings
 		$sql = "CREATE TABLE IF NOT EXISTS ". self::$tableName . " (
 	  		id mediumint(9) NOT NULL AUTO_INCREMENT,
 	    	Setting varchar(255) NOT NULL UNIQUE,
-	    	Value text NOT NULL,
+	    	Value mediumtext NOT NULL,
 	    	PRIMARY KEY (id)
 	  	) $charset_collate;";
 
