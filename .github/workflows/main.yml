@@ -1,23 +1,101 @@
 name: Deploy to WordPress.org
 on:
   release:
-    types: [published]
+    types: [published, released, edited]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  tag:
-    name: Release New Version ${{  github.ref_name }}
+  package:
+    name: Build & Package Release Asset
     runs-on: ubuntu-latest
     env:
       pluginSlug: 'easy-symbols-icons'
     steps:
-      - uses: actions/checkout@v3
-      - run: sed -i "s/.*Stable tag.*/Stable tag:\ ${{  github.ref_name }}/" README.txt
-      - run: sed -i 's/.*Version.*/Version:\ ${{  github.ref_name }}/' easy-symbols-icons.php
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Bump Version Numbers
+        run: |
+          sed -i "s/.*Stable tag.*/Stable tag:\ ${{ github.ref_name }}/" README.txt
+          sed -i 's/.*Version.*/Version:\ ${{ github.ref_name }}/' easy-symbols-icons.php
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Install npm dependencies
+        run: |
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          elif [ -f "package.json" ]; then
+            npm install
+          fi
+
+      - name: Run Build Script
+        run: bash scripts/build.sh
+
+      - name: Create Zip Package
+        shell: bash
+        run: |
+          mkdir -p temp_package/${{ env.pluginSlug }}
+          cp -r ./ temp_package/${{ env.pluginSlug }}/
+          rm -rf temp_package/${{ env.pluginSlug }}/.git
+          rm -rf temp_package/${{ env.pluginSlug }}/.github
+          rm -rf temp_package/${{ env.pluginSlug }}/.idea
+          rm -rf temp_package/${{ env.pluginSlug }}/.gitignore
+          rm -rf temp_package/${{ env.pluginSlug }}/tests
+          rm -rf temp_package/${{ env.pluginSlug }}/bin
+          rm -rf temp_package/${{ env.pluginSlug }}/phpunit.*
+          rm -rf temp_package/${{ env.pluginSlug }}/scripts
+          rm -rf temp_package/${{ env.pluginSlug }}/package*
+          rm -rf temp_package/${{ env.pluginSlug }}/composer*
+          rm -rf temp_package/${{ env.pluginSlug }}/vendor/phenx/php-font-lib/.git
+          rm -rf temp_package/${{ env.pluginSlug }}/vendor/phenx/php-font-lib/.github
+          cd temp_package && zip -qq -r ../${{ env.pluginSlug }}.zip ${{ env.pluginSlug }} && cd ..
+
+      - name: Upload Release Asset to GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" "./${{ env.pluginSlug }}.zip" --clobber --repo "${{ github.repository }}"
+
+  deploy-wordpress-org:
+    name: Deploy to WordPress.org Marketplace
+    runs-on: ubuntu-latest
+    needs: [package]
+    if: "!github.event.release.prerelease"
+    env:
+      pluginSlug: 'easy-symbols-icons'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Bump Version Numbers
+        run: |
+          sed -i "s/.*Stable tag.*/Stable tag:\ ${{ github.ref_name }}/" README.txt
+          sed -i 's/.*Version.*/Version:\ ${{ github.ref_name }}/' easy-symbols-icons.php
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: |
+          if [ -f "package-lock.json" ]; then
+            npm ci
+          elif [ -f "package.json" ]; then
+            npm install
+          fi
 
       - name: Run Build Script
         run: bash scripts/build.sh
